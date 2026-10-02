@@ -28,11 +28,15 @@ class MainActivity : Activity() {
     private val handler = Handler(Looper.getMainLooper())
     private lateinit var packageEdit: EditText
     private lateinit var statusView: TextView
+    private lateinit var candidateView: TextView
     private lateinit var logView: TextView
     private val captureRequestCode = 501
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        if (DiagnosticStore.getTargetPackage(this).isBlank()) {
+            DiagnosticStore.setTargetPackage(this, "com.wolt.courierapp")
+        }
         setContentView(buildUi())
         requestNotificationPermissionIfNeeded()
         refresh()
@@ -63,21 +67,21 @@ class MainActivity : Activity() {
         }
 
         root.addView(TextView(this).apply {
-            text = "ShiftPilot · Wolt Diagnostic V1"
+            text = "ShiftPilot · Wolt Collector V2"
             textSize = 24f
             setTextColor(Color.rgb(17, 24, 39))
             setTypeface(typeface, android.graphics.Typeface.BOLD)
         })
 
         root.addView(TextView(this).apply {
-            text = "Purpose: verify what a courier's phone can legitimately expose from Wolt via notifications, Accessibility, and normal Android screen-capture permission. This app does not click, accept, reject, or bypass secure screens."
+            text = "Goal: automatically detect Wolt order screens, OCR them locally, and extract payment/distances without screenshots being stored. V2 is a collector/diagnostic build: it does not click Accept/Reject and does not send orders to the backend yet."
             textSize = 14f
             setTextColor(Color.DKGRAY)
             setPadding(0, dp(8), 0, dp(14))
         })
 
         packageEdit = EditText(this).apply {
-            hint = "Wolt package (leave empty for auto-detect by name)"
+            hint = "Wolt package"
             setText(DiagnosticStore.getTargetPackage(this@MainActivity))
             inputType = InputType.TYPE_CLASS_TEXT
             setSingleLine(true)
@@ -101,10 +105,10 @@ class MainActivity : Activity() {
             startActivity(Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS))
         })
 
-        root.addView(button("2 · Enable Accessibility diagnostic") {
+        root.addView(button("2 · Enable Accessibility probe") {
             AlertDialog.Builder(this)
-                .setTitle("Accessibility diagnostic")
-                .setMessage("Enable only the ShiftPilot Wolt UI Probe service. It reads visible UI text for this diagnostic and never performs clicks or gestures.")
+                .setTitle("Accessibility probe")
+                .setMessage("Enable only ShiftPilot Wolt UI Probe. It is used to detect when Wolt is foreground and to inspect visible UI metadata. It never performs clicks or gestures.")
                 .setNegativeButton("Cancel", null)
                 .setPositiveButton("Open settings") { _, _ ->
                     startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
@@ -112,14 +116,38 @@ class MainActivity : Activity() {
                 .show()
         })
 
-        root.addView(button("3 · Test screen capture in 8 seconds") {
+        root.addView(button("3 · Start automatic Wolt collector") {
             AlertDialog.Builder(this)
-                .setTitle("Screen capture test")
-                .setMessage("Android will ask for normal screen-capture permission. After approving it, immediately open the Wolt order/offer screen. ShiftPilot analyzes one frame after 8 seconds and stores only statistics — not the screenshot. If Wolt marks the screen secure, the result should look black/blocked.")
+                .setTitle("Start automatic collector")
+                .setMessage("Android will ask for normal screen-capture permission. After approval, ShiftPilot keeps a MediaProjection session running and OCRs changed frames only while Wolt is foreground. Images are processed in memory and are not saved.")
                 .setNegativeButton("Cancel", null)
                 .setPositiveButton("Start") { _, _ -> requestCapture() }
                 .show()
         })
+
+        root.addView(button("Stop collector") {
+            val i = Intent(this, CaptureProbeService::class.java).apply {
+                action = CaptureProbeService.ACTION_STOP
+            }
+            startService(i)
+            Toast.makeText(this, "Collector stop requested", Toast.LENGTH_SHORT).show()
+        })
+
+        candidateView = TextView(this).apply {
+            textSize = 13f
+            typeface = android.graphics.Typeface.MONOSPACE
+            setTextColor(Color.rgb(17, 24, 39))
+            setBackgroundColor(Color.rgb(232, 241, 255))
+            setPadding(dp(10), dp(10), dp(10), dp(10))
+            setTextIsSelectable(true)
+        }
+        root.addView(TextView(this).apply {
+            text = "Last automatic order candidate"
+            textSize = 17f
+            setTypeface(typeface, android.graphics.Typeface.BOLD)
+            setPadding(0, dp(14), 0, dp(6))
+        })
+        root.addView(candidateView, matchWrap())
 
         val actionRow = LinearLayout(this).apply {
             orientation = LinearLayout.HORIZONTAL
@@ -143,7 +171,7 @@ class MainActivity : Activity() {
         })
 
         logView = TextView(this).apply {
-            textSize = 11f
+            textSize = 10.5f
             typeface = android.graphics.Typeface.MONOSPACE
             setTextColor(Color.rgb(17, 24, 39))
             setBackgroundColor(Color.WHITE)
@@ -168,7 +196,7 @@ class MainActivity : Activity() {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode != captureRequestCode) return
         if (resultCode != RESULT_OK || data == null) {
-            DiagnosticStore.append(this, "CAPTURE", "User cancelled screen capture permission")
+            DiagnosticStore.append(this, "COLLECTOR", "User cancelled screen capture permission")
             return
         }
 
@@ -177,18 +205,21 @@ class MainActivity : Activity() {
             putExtra(CaptureProbeService.EXTRA_RESULT_DATA, data)
         }
         if (Build.VERSION.SDK_INT >= 26) startForegroundService(service) else startService(service)
-        Toast.makeText(this, "Now open Wolt. Test runs in 8 seconds.", Toast.LENGTH_LONG).show()
+        Toast.makeText(this, "Collector started. Open Wolt now.", Toast.LENGTH_LONG).show()
     }
 
     private fun refresh() {
         val notif = notificationListenerEnabled()
         val access = accessibilityEnabled()
         val target = DiagnosticStore.getTargetPackage(this)
+        val collector = DiagnosticStore.isCollectorRunning(this)
         statusView.text = buildString {
             append("Notification listener: ").append(if (notif) "ON" else "OFF").append('\n')
             append("Accessibility probe: ").append(if (access) "ON" else "OFF").append('\n')
-            append("Target: ").append(if (target.isBlank()) "auto-detect Wolt" else target)
+            append("Collector: ").append(if (collector) "RUNNING" else "STOPPED").append('\n')
+            append("Target: ").append(target.ifBlank { "auto-detect Wolt" })
         }
+        candidateView.text = DiagnosticStore.getLastCandidate(this)
         logView.text = DiagnosticStore.read(this)
     }
 
@@ -209,13 +240,19 @@ class MainActivity : Activity() {
     }
 
     private fun shareReport() {
-        val report = DiagnosticStore.read(this)
+        val report = buildString {
+            append("ShiftPilot Wolt Collector V2\n\n")
+            append("LAST CANDIDATE\n")
+            append(DiagnosticStore.getLastCandidate(this@MainActivity)).append("\n\n")
+            append("LOG\n")
+            append(DiagnosticStore.read(this@MainActivity))
+        }
         val i = Intent(Intent.ACTION_SEND).apply {
             type = "text/plain"
-            putExtra(Intent.EXTRA_SUBJECT, "ShiftPilot Wolt diagnostic report")
+            putExtra(Intent.EXTRA_SUBJECT, "ShiftPilot Wolt Collector V2 report")
             putExtra(Intent.EXTRA_TEXT, report)
         }
-        startActivity(Intent.createChooser(i, "Share diagnostic report"))
+        startActivity(Intent.createChooser(i, "Share collector report"))
     }
 
     private fun requestNotificationPermissionIfNeeded() {
@@ -229,9 +266,6 @@ class MainActivity : Activity() {
         setOnClickListener { click() }
         isAllCaps = false
     }
-
-    private fun button(text: String, click: () -> Unit, lp: LinearLayout.LayoutParams): Button =
-        button(text, click).also { it.layoutParams = lp }
 
     private fun matchWrap() = LinearLayout.LayoutParams(
         LinearLayout.LayoutParams.MATCH_PARENT,

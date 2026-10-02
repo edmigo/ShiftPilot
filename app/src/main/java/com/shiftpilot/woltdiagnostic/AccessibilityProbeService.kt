@@ -17,10 +17,11 @@ class AccessibilityProbeService : AccessibilityService() {
 
     override fun onAccessibilityEvent(event: AccessibilityEvent?) {
         val pkg = event?.packageName?.toString().orEmpty()
+        if (pkg.isNotBlank()) DiagnosticStore.noteForegroundPackage(this, pkg)
         if (!DiagnosticStore.matchesTarget(this, pkg)) return
 
         val now = SystemClock.elapsedRealtime()
-        if (now - lastLogAt < 700) return
+        if (now - lastLogAt < 900) return
 
         val root = rootInActiveWindow ?: return
         val snapshot = snapshotTree(root)
@@ -29,7 +30,11 @@ class AccessibilityProbeService : AccessibilityService() {
 
         lastHash = hash
         lastLogAt = now
-        DiagnosticStore.append(this, "A11Y", "package=$pkg\n$snapshot")
+        DiagnosticStore.append(
+            this,
+            "A11Y",
+            "package=$pkg event=${event?.eventType} eventText=${event?.text?.joinToString(" | ").orEmpty()}\n$snapshot"
+        )
     }
 
     override fun onInterrupt() {
@@ -44,7 +49,7 @@ class AccessibilityProbeService : AccessibilityService() {
         val out = ArrayList<String>()
         var seen = 0
 
-        while (q.isNotEmpty() && seen < 450 && out.size < 100) {
+        while (q.isNotEmpty() && seen < 700 && out.size < 160) {
             val item = q.removeFirst()
             val n = item.node
             seen++
@@ -52,14 +57,14 @@ class AccessibilityProbeService : AccessibilityService() {
             val text = n.text?.toString()?.trim().orEmpty()
             val desc = n.contentDescription?.toString()?.trim().orEmpty()
             val id = n.viewIdResourceName.orEmpty()
-            val cls = n.className?.toString()?.substringAfterLast('.').orEmpty()
+            val cls = n.className?.toString()?.orEmpty()
 
             if (text.isNotBlank() || desc.isNotBlank() || id.isNotBlank()) {
                 val indent = "  ".repeat(item.depth.coerceAtMost(8))
-                out += "$indent[$cls] id=${id.ifBlank { "-" }} text=${text.ifBlank { "-" }} desc=${desc.ifBlank { "-" }}"
+                out += "$indent[$cls] id=${id.ifBlank { "-" }} text=${text.ifBlank { "-" }} desc=${desc.ifBlank { "-" }} clickable=${n.isClickable}"
             }
 
-            if (item.depth < 12) {
+            if (item.depth < 14) {
                 for (i in 0 until n.childCount) {
                     n.getChild(i)?.let { q.add(Item(it, item.depth + 1)) }
                 }
