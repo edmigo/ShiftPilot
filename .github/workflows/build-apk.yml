@@ -1,4 +1,4 @@
-name: Build ShiftPilot Diagnostic V2 APK
+name: Build ShiftPilot Collector V2 APK
 
 on:
   workflow_dispatch:
@@ -39,11 +39,11 @@ jobs:
         run: gradle :app:assembleDebug --no-daemon --stacktrace
 
       - name: Rename APK
-        run: cp app/build/outputs/apk/debug/app-debug.apk ShiftPilot-Wolt-Diagnostic-V2.apk
+        run: cp app/build/outputs/apk/debug/app-debug.apk ShiftPilot-Wolt-Collector-V2.apk
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: ShiftPilot-Wolt-Diagnostic-V1-APK
-          path: ShiftPilot-Wolt-Diagnostic-V1.apk
+          name: ShiftPilot-Wolt-Collector-V2-APK
+          path: ShiftPilot-Wolt-Collector-V2.apk
           if-no-files-found: error
