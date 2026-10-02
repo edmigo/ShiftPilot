@@ -1,0 +1,1484 @@
+<!doctype html><html lang="en" dir="ltr"><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}html[dir="rtl"] .breakdown span:nth-child(even){text-align:left} html[dir="rtl"] th{text-align:right} html[dir="rtl"] td.r,html[dir="rtl"] th.r{text-align:left} html[dir="rtl"] .brand i{transform:scaleX(-1)}
+</style></head><body>
+<title>ShiftPilot AI</title>
+<meta name="theme-color" content="#1d4fd6">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500;600&display=swap">
+<style>
+/* Layout: one-column phone app, road-sign type for figures, bottom tab bar for one-handed use */
+:root{
+  --bg:#eef0f3; --surface:#ffffff; --ink:#15202b; --muted:#5b6674; --line:#d6dbe1;
+  --accent:#1d4fd6; --accent-ink:#ffffff; --accent-soft:#e3eaff;
+  --go:#17854a; --go-soft:#e1f3e8; --warn:#b86e00; --warn-soft:#fbefd9; --stop:#c3332b; --stop-soft:#fbe3e1;
+  --heat1:#ffe39a; --heat2:#f07b1d; --heat3:#a3240a; --grid:#e3e7ec;
+  --f-display:"Barlow Condensed","Arial Narrow",system-ui,sans-serif;
+  --f-body:"Barlow",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0f141a; --surface:#18212b; --ink:#e6ebf1; --muted:#95a1af; --line:#2b3643;
+  --accent:#6f98ff; --accent-ink:#0b1220; --accent-soft:#1c2a4a;
+  --go:#46c27b; --go-soft:#16301f; --warn:#f1a73c; --warn-soft:#352812; --stop:#ff6f62; --stop-soft:#3a1a18;
+  --heat1:#5a3b0c; --heat2:#e8751c; --heat3:#ffd37a; --grid:#222c37; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f141a; --surface:#18212b; --ink:#e6ebf1; --muted:#95a1af; --line:#2b3643;
+  --accent:#6f98ff; --accent-ink:#0b1220; --accent-soft:#1c2a4a;
+  --go:#46c27b; --go-soft:#16301f; --warn:#f1a73c; --warn-soft:#352812; --stop:#ff6f62; --stop-soft:#3a1a18;
+  --heat1:#5a3b0c; --heat2:#e8751c; --heat3:#ffd37a; --grid:#222c37; color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{background:var(--bg);color:var(--ink)}
+body{font-family:var(--f-body);font-size:16px;line-height:1.45;padding-bottom:88px}
+.wrap{max-width:560px;margin:0 auto;padding:0 16px}
+header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);padding-block:12px 10px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.brand{font-family:var(--f-display);font-weight:700;font-size:24px;letter-spacing:.02em;text-transform:uppercase;display:flex;align-items:center;gap:10px}
+.brand i{display:inline-block;width:26px;height:26px;border-radius:6px;background:var(--accent);position:relative}
+.brand i::after{content:"";position:absolute;inset:7px 6px;border:2.5px solid var(--accent-ink);border-left:0;border-bottom:0;transform:rotate(45deg) translate(-2px,2px)}
+.icon-btn{background:var(--surface);border:1px solid var(--line);color:var(--ink);border-radius:10px;height:40px;padding:0 12px;font:500 14px var(--f-body);cursor:pointer}
+button{font-family:var(--f-body)}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+section.tab{display:flex;flex-direction:column;gap:14px;padding-block:4px 20px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.eyebrow{font-size:12px;font-weight:600;letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+h2{font-family:var(--f-display);font-weight:700;font-size:22px;margin:0;letter-spacing:.01em;text-wrap:balance}
+.muted{color:var(--muted)}
+.small{font-size:14px}
+.num{font-family:var(--f-display);font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:.01em}
+.clock{font-size:64px;line-height:1}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.stat{display:flex;flex-direction:column;gap:2px;min-width:0}
+.stat b{font-family:var(--f-display);font-size:26px;font-weight:700;font-variant-numeric:tabular-nums;line-height:1.05}
+.stat span{font-size:12px;color:var(--muted);letter-spacing:.04em;text-transform:uppercase}
+@media (max-width:380px){.stats{grid-template-columns:repeat(2,1fr)}}
+.pills{display:flex;flex-wrap:wrap;gap:6px}
+.pill{font-size:13px;font-weight:600;padding:3px 10px;border-radius:999px;background:var(--bg);color:var(--muted);border:1px solid var(--line)}
+.pill.ok{background:var(--go-soft);color:var(--go);border-color:transparent}
+.pill.bad{background:var(--warn-soft);color:var(--warn);border-color:transparent}
+.btn{border:0;border-radius:12px;min-height:52px;padding:0 18px;font-size:17px;font-weight:600;cursor:pointer;background:var(--accent);color:var(--accent-ink)}
+.btn.ghost{background:var(--surface);color:var(--ink);border:1.5px solid var(--line)}
+.btn.stop{background:var(--stop);color:#fff}
+.btn.go{background:var(--go);color:#fff}
+.btn.sm{min-height:40px;font-size:15px;padding:0 14px}
+.row{display:flex;gap:10px;flex-wrap:wrap}
+.row>.btn{flex:1 1 140px}
+.order{border:1px solid var(--line);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:8px}
+.order-h{display:flex;justify-content:space-between;gap:10px;align-items:baseline}
+.order-h b{font-weight:600;min-width:0;overflow-wrap:anywhere}
+.steps{display:flex;gap:4px}
+.steps i{flex:1;height:4px;border-radius:2px;background:var(--line)}
+.steps i.on{background:var(--accent)}
+.hint{display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border-radius:12px;background:var(--accent-soft);font-size:15px}
+.hint b{color:var(--accent)}
+/* order tab */
+.mic-zone{display:flex;align-items:center;gap:16px}
+.mic{width:84px;height:84px;flex:none;border-radius:50%;border:0;background:var(--accent);color:var(--accent-ink);cursor:pointer;display:grid;place-items:center;position:relative}
+.mic svg{width:34px;height:34px}
+.mic.live{background:var(--stop);color:#fff}
+.mic.live::after{content:"";position:absolute;inset:-8px;border-radius:50%;border:3px solid var(--stop);animation:pulse 1.2s ease-out infinite}
+.capture-actions{display:flex;gap:12px;align-items:flex-start;flex-wrap:wrap}
+.capture-method{display:flex;align-items:center;gap:10px;min-width:0}
+.camera-btn{width:84px;height:84px;flex:none;border-radius:18px;border:1.5px solid var(--line);background:var(--surface);color:var(--accent);cursor:pointer;display:grid;place-items:center}
+.camera-btn svg{width:36px;height:36px}
+.camera-btn.busy{opacity:.55;pointer-events:none}
+.photo-panel{display:grid;grid-template-columns:96px 1fr;gap:12px;align-items:start;padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--bg)}
+.photo-preview{width:96px;height:96px;object-fit:cover;border-radius:10px;border:1px solid var(--line);background:var(--surface)}
+.photo-tools{display:flex;flex-direction:column;gap:8px;min-width:0}
+.ocr-progress{height:7px;border-radius:999px;background:var(--line);overflow:hidden}
+.ocr-progress>i{display:block;height:100%;width:0;background:var(--accent);transition:width .2s ease}
+.photo-secondary{display:flex;gap:8px;flex-wrap:wrap}
+@media (max-width:430px){.photo-panel{grid-template-columns:72px 1fr}.photo-preview{width:72px;height:72px}}
+@keyframes pulse{from{opacity:.8;transform:scale(.9)}to{opacity:0;transform:scale(1.25)}}
+@media (prefers-reduced-motion:reduce){.mic.live::after{animation:none}}
+.field{display:flex;flex-direction:column;gap:4px;min-width:0}
+.field label{font-size:13px;color:var(--muted);font-weight:500}
+input,select,textarea{font:500 17px var(--f-body);color:var(--ink);background:var(--bg);border:1.5px solid var(--line);border-radius:10px;padding:10px 12px;width:100%;min-width:0}
+textarea{resize:vertical;min-height:64px;font-size:16px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+@media (max-width:400px){.grid3{grid-template-columns:1fr 1fr}.grid3 .field:first-child{grid-column:1/-1}}
+.seg{display:flex;border:1.5px solid var(--line);border-radius:10px;overflow:hidden}
+.seg button{flex:1;border:0;background:var(--bg);color:var(--muted);padding:10px;font-size:15px;font-weight:600;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+.verdict{border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:10px;border:1.5px solid transparent}
+.verdict.go{background:var(--go-soft);border-color:var(--go)}
+.verdict.warn{background:var(--warn-soft);border-color:var(--warn)}
+.verdict.stop{background:var(--stop-soft);border-color:var(--stop)}
+.verdict.idle{background:var(--surface);border-color:var(--line)}
+.v-top{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.v-word{font-family:var(--f-display);font-weight:700;font-size:44px;line-height:1;text-transform:uppercase;letter-spacing:.02em}
+.go .v-word{color:var(--go)} .warn .v-word{color:var(--warn)} .stop .v-word{color:var(--stop)}
+.v-rate{font-family:var(--f-display);font-weight:700;font-size:34px;font-variant-numeric:tabular-nums}
+.v-rate small{font-size:18px;color:var(--muted)}
+.breakdown{display:grid;grid-template-columns:1fr auto;gap:4px 12px;font-size:15px;font-variant-numeric:tabular-nums}
+.breakdown span:nth-child(even){text-align:right;font-weight:600}
+.breakdown .sep{grid-column:1/-1;border-top:1px dashed var(--line);margin:4px 0}
+.transcript{font-size:15px;color:var(--muted);font-style:italic;min-height:1.4em}
+.msg{font-size:14px;padding:10px 12px;border-radius:10px;background:var(--warn-soft);color:var(--ink)}
+/* log */
+.tiles{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.tile{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 14px;display:flex;flex-direction:column;gap:2px}
+.tile b{font-family:var(--f-display);font-size:32px;font-weight:700;font-variant-numeric:tabular-nums;line-height:1.05}
+.tile span{font-size:12px;color:var(--muted);letter-spacing:.05em;text-transform:uppercase}
+.chart-box{overflow-x:auto}
+.chart-box svg{display:block;width:100%;height:auto;min-width:320px}
+table{width:100%;border-collapse:collapse;font-size:15px;font-variant-numeric:tabular-nums}
+th{font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);text-align:left;padding:6px 4px;border-bottom:1px solid var(--line)}
+td{padding:9px 4px;border-bottom:1px solid var(--line);vertical-align:top}
+td.r,th.r{text-align:right}
+.tbl{overflow-x:auto}
+.tag{font-size:11px;font-weight:600;padding:1px 6px;border-radius:5px;background:var(--bg);color:var(--muted);border:1px solid var(--line);margin-left:6px;vertical-align:1px}
+.bar-in{height:6px;border-radius:3px;background:var(--warn)}
+/* map */
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{border:1.5px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:6px 14px;font-size:14px;font-weight:600;cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+canvas#heat{width:100%;display:block;border-radius:12px;background:var(--bg);touch-action:none}
+.legend{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted)}
+.legend i{flex:1;height:8px;border-radius:4px;background:linear-gradient(90deg,var(--heat1),var(--heat2),var(--heat3))}
+.zones{display:flex;flex-direction:column;gap:8px}
+.zone{display:grid;grid-template-columns:32px 1fr auto;gap:10px;align-items:center}
+.zone .n{width:32px;height:32px;border-radius:8px;display:grid;place-items:center;font-family:var(--f-display);font-weight:700;font-size:18px;background:var(--heat2);color:#fff}
+/* nav */
+nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:10;background:var(--surface);border-top:1px solid var(--line);padding:6px 8px calc(6px + env(safe-area-inset-bottom,0px));display:flex;justify-content:center}
+nav.tabs .in{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;width:100%;max-width:560px}
+nav.tabs button{background:none;border:0;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 0;font-size:12px;font-weight:600;cursor:pointer;border-radius:10px}
+nav.tabs button svg{width:24px;height:24px}
+nav.tabs button[aria-selected="true"]{color:var(--accent);background:var(--accent-soft)}
+.set-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.danger{color:var(--stop)}
+.profile-gate{position:fixed;inset:0;z-index:3000;background:rgba(4,8,13,.82);backdrop-filter:blur(8px);display:grid;place-items:center;padding:18px}
+.profile-box{width:min(460px,100%);max-height:92vh;overflow:auto;background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:20px;box-shadow:0 24px 70px rgba(0,0,0,.35)}
+.profile-box h2{font-size:28px;margin-bottom:4px}
+.profile-box .profile-logo{font-family:var(--f-display);font-size:14px;font-weight:700;letter-spacing:.12em;color:var(--accent);text-transform:uppercase;margin-bottom:14px}
+.plan-badge{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:4px 10px;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;background:var(--accent-soft);color:var(--accent)}
+.pricing-gate{position:fixed;inset:0;z-index:3200;background:rgba(4,8,13,.86);backdrop-filter:blur(8px);display:grid;place-items:center;padding:18px}
+.pricing-box{width:min(920px,100%);max-height:94vh;overflow:auto;background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:18px;box-shadow:0 24px 70px rgba(0,0,0,.4)}
+.pricing-head{display:flex;align-items:center;gap:12px;margin-bottom:14px}.pricing-head h2{font-size:30px}.pricing-head button{margin-left:auto}
+.pricing-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.plan-card{border:1.5px solid var(--line);border-radius:16px;padding:16px;background:var(--bg);display:flex;flex-direction:column;gap:10px}
+.plan-card.hot{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-soft) inset}
+.plan-card .price{font-family:var(--f-display);font-size:40px;font-weight:700;line-height:1}.plan-card .price small{font:500 14px var(--f-body);color:var(--muted)}
+.plan-card ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px;font-size:14px}.plan-card .btn{margin-top:auto}
+.access-note{border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:10px 12px;font-size:14px}
+.access-note.warn{background:var(--warn-soft);border-color:var(--warn)}
+.locked-feature{padding:18px;border:1.5px dashed var(--line);border-radius:14px;background:var(--surface);text-align:center}
+@media(max-width:760px){.pricing-grid{grid-template-columns:1fr}.pricing-box{padding:12px}.plan-card{padding:14px}}
+
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div class="brand"><i aria-hidden="true"></i>ShiftPilot AI</div>
+    <button class="icon-btn" id="openSettings">Настройки</button>
+  </header>
+
+  <!-- ===== SHIFT ===== -->
+  <section class="tab" id="tab-shift">
+    <div class="card">
+      <div class="row" style="justify-content:space-between;align-items:center">
+        <div class="eyebrow" id="shiftLabel">Смена не начата</div>
+        <div class="pills" id="statusPills"></div>
+      </div>
+      <div class="num clock" id="clock">00:00:00</div>
+      <div class="stats">
+        <div class="stat"><b id="sEarn">0</b><span>Заработано</span></div>
+        <div class="stat"><b id="sRate">—</b><span>В час</span></div>
+        <div class="stat"><b id="sOrders">0</b><span>Заказов</span></div>
+        <div class="stat"><b id="sKm">0.0</b><span>Км</span></div>
+      </div>
+      <button class="btn" id="shiftBtn">Начать смену</button>
+      <div class="access-note" id="accessNote">Проверяю подписку…</div>
+    </div>
+    <div class="hint" id="zoneHint" hidden></div>
+    <div class="card" id="activeCard" hidden>
+      <h2>Заказы в работе</h2>
+      <div id="activeList" style="display:flex;flex-direction:column;gap:10px"></div>
+    </div>
+  </section>
+
+  <!-- ===== ORDER ===== -->
+  <section class="tab" id="tab-order" hidden>
+    <div class="card">
+      <div class="capture-actions">
+        <div class="capture-method">
+          <button class="mic" id="micBtn" aria-label="Надиктовать заказ">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="3" width="6" height="11" rx="3" fill="currentColor" stroke="none"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>
+          </button>
+          <div style="min-width:0">
+            <h2>Надиктуй заказ</h2>
+            <div class="small muted">«Пицца Ромео, адрес Дизенгоф 50, до ресторана 1,2 км, доставка 3,5 км, 32 шекеля»</div>
+          </div>
+        </div>
+        <div class="capture-method">
+          <button class="camera-btn" id="cameraBtn" aria-label="Сфотографировать заказ">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h3l1.5-2h7L17 7h3a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2z"/><circle cx="12" cy="13" r="4"/></svg>
+          </button>
+          <div style="min-width:0">
+            <h2>Фото заказа</h2>
+            <div class="small muted">Сфотографируй заказ Wolt или выбери его скриншот — я заполню форму автоматически.</div>
+            <button class="btn ghost sm" id="galleryBtn" type="button" style="margin-top:8px">Выбрать скриншот</button>
+            <div class="small muted" style="margin-top:8px">Или сделай скриншот Wolt → Share → ShiftPilot. Заказ откроется здесь автоматически.</div>
+          </div>
+        </div>
+      </div>
+      <input id="cameraInput" type="file" accept="image/*" capture="environment" hidden>
+      <input id="galleryInput" type="file" accept="image/*" hidden>
+      <div class="photo-panel" id="photoPanel" hidden>
+        <img class="photo-preview" id="photoPreview" alt="Фото заказа">
+        <div class="photo-tools">
+          <div class="small" id="photoStatus">Распознаю заказ…</div>
+          <div class="ocr-progress" id="ocrProgress"><i></i></div>
+          <div class="small muted">Фото обрабатывается на устройстве и не отправляется на сервер.</div>
+          <div class="photo-secondary">
+            <button class="btn ghost sm" id="photoRetry" type="button">Другое фото</button>
+            <button class="btn ghost sm" id="photoClose" type="button">Закрыть</button>
+          </div>
+        </div>
+      </div>
+      <div class="transcript" id="transcript"></div>
+      <div class="msg" id="micMsg" hidden></div>
+      <div class="field">
+        <label for="phrase">Или напиши той же фразой</label>
+        <textarea id="phrase" rows="2" placeholder="Ресторан, адрес, км до ресторана, км доставки, сумма"></textarea>
+      </div>
+      <button class="btn ghost sm" id="parseBtn">Разобрать фразу</button>
+    </div>
+
+    <div class="card">
+      <div class="grid2">
+        <div class="field"><label for="fRest">Ресторан</label><input id="fRest" autocomplete="off"></div>
+        <div class="field"><label for="fAddr">Адрес доставки</label><input id="fAddr" autocomplete="off"></div>
+      </div>
+      <div class="grid3">
+        <div class="field"><label for="fPay">Оплата, <span class="cur"></span></label><input id="fPay" inputmode="decimal"></div>
+        <div class="field"><label for="fPk">До ресторана, км</label><input id="fPk" inputmode="decimal"></div>
+        <div class="field"><label for="fDl">Доставка, км</label><input id="fDl" inputmode="decimal"></div>
+      </div>
+      <div class="field">
+        <label>Куда повезёшь</label>
+        <div class="seg" id="zoneSeg">
+          <button data-z="center" aria-pressed="true">Где много заказов</button>
+          <button data-z="far" aria-pressed="false">Окраина, возвращаться пустым</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="verdict idle" id="verdict">
+      <div class="v-top"><div class="v-word" id="vWord">Жду заказ</div><div class="v-rate" id="vRate"></div></div>
+      <div class="small muted" id="vWhy">Заполни оплату и расстояния, и я посчитаю доход в час.</div>
+      <div class="breakdown" id="vBreak" hidden></div>
+    </div>
+    <div class="row">
+      <button class="btn go" id="takeBtn">Взял заказ</button>
+      <button class="btn ghost" id="clearBtn">Пропустить</button>
+    </div>
+    <div class="msg" id="takeMsg" hidden></div>
+  </section>
+
+  <!-- ===== LOG ===== -->
+  <section class="tab" id="tab-log" hidden>
+    <div class="hint" id="exampleNote" hidden></div>
+    <div class="eyebrow" id="logPeriodLabel">Последние 7 дней</div>
+    <div class="tiles">
+      <div class="tile"><b id="wEarn">0</b><span>Заработано</span></div>
+      <div class="tile"><b id="wRate">—</b><span>Средний доход в час</span></div>
+      <div class="tile"><b id="wHours">0</b><span>Часов на линии</span></div>
+      <div class="tile"><b id="wOrders">0</b><span>Заказов</span></div>
+    </div>
+    <div class="card">
+      <h2>Доход в час по времени суток</h2>
+      <div class="small muted">Все смены. Пунктир — твоя цель.</div>
+      <div class="chart-box" id="hourChart"></div>
+    </div>
+    <div class="card" id="restaurantAnalyticsCard">
+      <h2>Где дольше всего ждёшь</h2>
+      <div class="tbl"><table id="restTable"></table></div>
+    </div>
+    <div class="card">
+      <h2>Смены</h2>
+      <div class="tbl"><table id="shiftTable"></table></div>
+    </div>
+  </section>
+
+  <!-- ===== MAP ===== -->
+  <section class="tab" id="tab-map" hidden>
+    <div class="locked-feature" id="mapLock" hidden>
+      <h2>Тепловая карта доступна в Plus</h2>
+      <div class="small muted" style="margin:8px 0 14px">Обнови тариф, чтобы видеть свою карту заказов и лучшие зоны ожидания.</div>
+      <button class="btn sm" id="mapUpgrade">Посмотреть тарифы</button>
+    </div>
+    <div class="card" id="mapMainCard">
+      <div class="row" style="justify-content:space-between;align-items:center">
+        <h2>Где забирал заказы</h2>
+        <div class="chips" id="mapFilter">
+          <button class="chip" data-f="now" aria-pressed="true">Похожее время</button>
+          <button class="chip" data-f="all" aria-pressed="false">Всё время</button>
+          <button class="chip" data-f="crowd" aria-pressed="false" id="crowdChip" hidden>Все курьеры</button>
+        </div>
+      </div>
+      <div class="small muted" id="mapCaption"></div>
+      <canvas id="heat" aria-label="Тепловая карта мест, где забирались заказы"></canvas>
+      <div class="legend"><span>реже</span><i></i><span>чаще</span></div>
+    </div>
+    <div class="card" id="mapZonesCard">
+      <h2>Лучшие зоны для ожидания</h2>
+      <div class="zones" id="zoneList"></div>
+      <div class="small muted">Квадрат сетки — 400 × 400 м. Карта строится только по твоей истории, без подложки улиц.</div>
+    </div>
+  </section>
+
+  <!-- ===== SETTINGS ===== -->
+  <section class="tab" id="tab-settings" hidden>
+    <div class="card">
+      <h2>Профиль курьера</h2>
+      <div class="small" id="profileSummary">Профиль не заполнен</div>
+      <button class="btn ghost sm" id="editProfile">Изменить профиль</button>
+    </div>
+    <div class="card">
+      <h2>Транспорт и цель</h2><div class="field"><label for="sLang">Язык / Language / שפה</label><select id="sLang"><option value="en">English</option><option value="ru">Русский</option><option value="he">עברית</option></select></div>
+      <div class="field"><label for="sVeh">Транспорт</label>
+        <select id="sVeh"><option value="bike">Велосипед</option><option value="scooter">Электросамокат / скутер</option><option value="car">Машина</option></select></div>
+      <div class="set-grid">
+        <div class="field"><label for="sSpeed">Средняя скорость, км/ч</label><input id="sSpeed" inputmode="decimal"></div>
+        <div class="field"><label for="sCost">Расход на 1 км, <span class="cur"></span></label><input id="sCost" inputmode="decimal"></div>
+        <div class="field"><label for="sTarget">Цель, <span class="cur"></span> в час</label><input id="sTarget" inputmode="decimal"></div>
+        <div class="field"><label for="sCur">Валюта</label><input id="sCur" maxlength="4"></div>
+        <div class="field"><label for="sWait">Ожидание в новом ресторане, мин</label><input id="sWait" inputmode="decimal"></div>
+        <div class="field"><label for="sHand">Передача клиенту, мин</label><input id="sHand" inputmode="decimal"></div>
+      </div>
+      <button class="btn" id="saveSettings">Сохранить</button>
+    </div>
+    <div class="card">
+      <div class="row" style="justify-content:space-between;align-items:center">
+        <h2>Подписка</h2>
+        <span class="plan-badge" id="planBadge">TRIAL</span>
+      </div>
+      <div class="small" id="planSummary">Проверяю подписку…</div>
+      <button class="btn ghost sm" id="openPlans">Сравнить тарифы</button>
+    </div>
+    <div class="card">
+      <h2>Облако</h2>
+      <div class="small" id="cloudState"></div>
+      <button class="btn ghost sm" id="syncNow">Отправить сейчас</button>
+    </div>
+    <div class="card">
+      <h2>Данные</h2>
+      <div class="small muted">Смены хранятся на телефоне. Если облако подключено, копия уходит на сервер, а примеры не отправляются.</div>
+      <div class="row">
+        <button class="btn ghost sm" id="clearExamples">Удалить примеры</button>
+        <button class="btn ghost sm danger" id="resetAll">Стереть всё</button>
+      </div>
+      <div class="row" id="resetConfirm" hidden>
+        <button class="btn stop sm" id="resetYes">Да, стереть все смены</button>
+        <button class="btn ghost sm" id="resetNo">Отмена</button>
+      </div>
+      <div class="small muted" id="dataMsg"></div>
+    </div>
+    <button class="btn ghost" id="closeSettings">Назад</button>
+  </section>
+</div>
+
+
+<div class="profile-gate" id="profileGate" hidden>
+  <div class="profile-box">
+    <div class="profile-logo">ShiftPilot</div>
+    <h2>Регистрация курьера</h2>
+    <div class="small muted" style="margin-bottom:14px">Введите данные один раз. Они будут видны только в защищённой панели управления ShiftPilot.</div>
+    <div class="field">
+      <label for="pName">Имя и фамилия</label>
+      <input id="pName" autocomplete="name" maxlength="80">
+    </div>
+    <div class="field" style="margin-top:10px">
+      <label for="pPhone">Телефон</label>
+      <input id="pPhone" autocomplete="tel" inputmode="tel" maxlength="40">
+    </div>
+    <div class="field" style="margin-top:10px">
+      <label for="pAlias">Номер / alias</label>
+      <input id="pAlias" autocomplete="off" maxlength="40" placeholder="Например: SP-017">
+    </div>
+    <div class="msg" id="profileMsg" hidden style="margin-top:12px"></div>
+    <div class="row" style="margin-top:14px">
+      <button class="btn" id="saveProfile">Сохранить профиль</button>
+      <button class="btn ghost" id="cancelProfile" hidden>Отмена</button>
+    </div>
+  </div>
+</div>
+
+
+<div class="pricing-gate" id="pricingGate" hidden>
+  <div class="pricing-box">
+    <div class="pricing-head">
+      <div>
+        <div class="profile-logo" style="font-family:var(--f-display);color:var(--accent);font-weight:700">ShiftPilot</div>
+        <h2>Тарифы</h2>
+        <div class="small muted">Первые 30 дней — полный доступ без ограничений.</div>
+      </div>
+      <button class="btn ghost sm" id="closePlans">Закрыть</button>
+    </div>
+    <div class="pricing-grid">
+      <div class="plan-card">
+        <h2>Free</h2>
+        <div class="price">$0 <small>/ месяц</small></div>
+        <ul>
+          <li>До 2 часов активной работы</li>
+          <li>После лимита — перерыв 6 часов</li>
+          <li>История за 7 дней</li>
+          <li>Смена, GPS, голос и фото заказа</li>
+        </ul>
+        <button class="btn ghost" data-plan-info="free">Free</button>
+      </div>
+      <div class="plan-card hot">
+        <div class="row" style="justify-content:space-between;align-items:center"><h2>Plus</h2><span class="plan-badge">POPULAR</span></div>
+        <div class="price">$9.99 <small>/ месяц</small></div>
+        <ul>
+          <li>До 5 часов активной работы</li>
+          <li>После лимита — перерыв 2 часа</li>
+          <li>История за 30 дней</li>
+          <li>Личная heatmap и зоны ожидания</li>
+          <li>Аналитика ресторанов</li>
+        </ul>
+        <button class="btn" data-plan-info="plus">Выбрать Plus</button>
+      </div>
+      <div class="plan-card">
+        <h2>Pro</h2>
+        <div class="price">$19.99 <small>/ месяц</small></div>
+        <ul>
+          <li>Без ограничений по времени</li>
+          <li>Полная история</li>
+          <li>Все функции Plus</li>
+          <li>Heatmap всех курьеров</li>
+          <li>Расширенная аналитика</li>
+        </ul>
+        <button class="btn" data-plan-info="pro">Выбрать Pro</button>
+      </div>
+    </div>
+    <div class="msg" id="planMsg" hidden style="margin-top:12px"></div>
+  </div>
+</div>
+
+<nav class="tabs"><div class="in" role="tablist">
+  <button role="tab" data-tab="shift" aria-selected="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l3 2M9 2h6"/></svg>Смена</button>
+  <button role="tab" data-tab="order" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 8h16l-1.5 11a2 2 0 0 1-2 1.7h-9a2 2 0 0 1-2-1.7z"/><path d="M8 8a4 4 0 0 1 8 0"/></svg>Заказ</button>
+  <button role="tab" data-tab="log" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 20V10M10 20V4M16 20v-8M22 20H2"/></svg>Журнал</button>
+  <button role="tab" data-tab="map" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>Карта</button>
+</div></nav>
+
+<script src="config.js"></script>
+<script src="i18n.js"></script>
+<script>
+(function(){
+"use strict";
+const KEY="kurier.v1";
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const tr=s=>window.CourierI18n?window.CourierI18n.t(s):s;
+const VEH={bike:{speed:14,cost:0},scooter:{speed:22,cost:0.15},car:{speed:24,cost:0.7}};
+const DEF_SET={veh:"scooter",speed:22,cost:0.15,target:60,cur:"₪",wait:6,hand:3,lang:"en"};
+
+/* ---------- storage ---------- */
+let S;
+function load(){try{const r=localStorage.getItem(KEY);return r?JSON.parse(r):null}catch(e){return null}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+S=load();
+if(!S||!S.settings){S={settings:{...DEF_SET},shifts:[],orders:[],active:null};seedExamples();save()}
+if(!["en","ru","he"].includes(S.settings.lang)){S.settings.lang="en";save()}
+const cfg=()=>S.settings;
+const locale=()=>cfg().lang==="ru"?"ru-RU":cfg().lang==="he"?"he-IL":"en-US";
+
+/* ---------- cloud sync (own FastAPI server) ---------- */
+const CLOUD=window.SHTURMAN_CONFIG||{};
+const BASE=String(CLOUD.apiUrl||"").replace(/\/+$/,"");
+const SYNC_ON=/^(https:\/\/|http:\/\/(localhost|127\.0\.0\.1))/.test(BASE)&&!/ВСТАВЬ/.test(BASE);
+let syncing=false,syncTimer=null,syncInfo={state:SYNC_ON?"idle":"off",err:"",at:0};
+function markDirty(kind,id){
+  if(!SYNC_ON||!id)return;
+  S.dirty=S.dirty||{o:{},s:{}};
+  const it=(kind==="o"?S.orders:S.shifts).find(x=>x.id===id);if(it&&it.example)return;
+  S.dirty[kind][id]=Date.now()+Math.random();save();scheduleSync(4000);
+}
+function scheduleSync(ms){if(!SYNC_ON||syncTimer)return;syncTimer=setTimeout(()=>{syncTimer=null;sync()},ms)}
+function pending(){const d=S.dirty||{o:{},s:{}};return Object.keys(d.o).length+Object.keys(d.s).length}
+function setAuth(j){S.auth={access_token:j.access_token,refresh_token:j.refresh_token||(S.auth&&S.auth.refresh_token),
+  expires_at:j.expires_at||Math.floor(Date.now()/1000)+(j.expires_in||3600),user_id:(j.user&&j.user.id)||(S.auth&&S.auth.user_id)};save()}
+function errText(j,t){if(!j)return t;const d=j.detail;if(typeof d==="string")return d;if(Array.isArray(d)&&d[0])return(d[0].loc||[]).join(".")+": "+d[0].msg;return t}
+async function post(path,body,headers){
+  let r;
+  try{r=await fetch(BASE+path,{method:"POST",headers:Object.assign({"Content-Type":"application/json"},headers||{}),body:JSON.stringify(body||{})})}
+  catch(e){throw new Error("Сервер недоступен. Проверь адрес в config.js и что сайт указан в CORS_ORIGINS.")}
+  const t=await r.text();let j=null;try{j=t?JSON.parse(t):null}catch(e){}
+  return{ok:r.ok,status:r.status,j,t};
+}
+async function token(){
+  const a=S.auth;
+  if(a&&a.access_token&&a.expires_at*1000>Date.now()+60e3)return a.access_token;
+  if(a&&a.refresh_token){
+    const r=await post("/api/auth/refresh",{refresh_token:a.refresh_token});
+    if(r.ok){setAuth(r.j);return S.auth.access_token}
+    if(r.status!==401)throw new Error("Вход не удался: "+r.status+" "+errText(r.j,r.t));
+  }
+  const r=await post("/api/auth/anonymous",{});
+  if(!r.ok)throw new Error(r.status===429?"Слишком много новых входов с этой сети, попробуй позже.":"Вход не удался: "+r.status+" "+errText(r.j,r.t));
+  setAuth(r.j);return S.auth.access_token;
+}
+async function api(path,opt,retry){
+  opt=opt||{};
+  const tok=await token();
+  let r;
+  try{r=await fetch(BASE+path,{method:opt.method||"GET",body:opt.body,headers:{Authorization:"Bearer "+tok,"Content-Type":"application/json"}})}
+  catch(e){throw new Error("Сервер недоступен. Проверь адрес в config.js и что сайт указан в CORS_ORIGINS.")}
+  if(r.status===401&&retry!==false){if(S.auth)S.auth.expires_at=0;return api(path,opt,false)}
+  const t=await r.text();let j=null;try{j=t?JSON.parse(t):null}catch(e){}
+  if(!r.ok)throw new Error("Ошибка сервера "+r.status+": "+errText(j,t));
+  return j;
+}
+
+async function loadProfile(showIfMissing){
+  if(!SYNC_ON)return null;
+  const p=await api("/api/profile");
+  S.profile=p;save();renderProfileSummary();
+  if(showIfMissing&&!p.complete)openProfileEditor(p,true);
+  return p;
+}
+function renderProfileSummary(){
+  const box=document.getElementById("profileSummary");if(!box)return;
+  const p=S.profile||{};
+  if(p.complete){
+    box.innerHTML=`<b>${esc(p.name)}</b><br><span class="muted">${esc(p.alias)} · ${esc(p.phone)}</span>`;
+  }else{
+    box.textContent=tr("Профиль не заполнен");
+  }
+}
+function openProfileEditor(p,required){
+  p=p||S.profile||{};
+  $("#pName").value=p.name||"";
+  $("#pPhone").value=p.phone||"";
+  $("#pAlias").value=p.alias||"";
+  $("#profileMsg").hidden=true;
+  $("#profileMsg").textContent="";
+  $("#cancelProfile").hidden=!!required;
+  $("#profileGate").hidden=false;
+  setTimeout(()=>$("#pName").focus(),50);
+}
+async function saveProfile(){
+  const name=$("#pName").value.trim(),phone=$("#pPhone").value.trim(),alias=$("#pAlias").value.trim();
+  const msg=$("#profileMsg");
+  if(!name||!phone||!alias){
+    msg.textContent=tr("Заполните имя, телефон и номер / alias.");msg.hidden=false;return;
+  }
+  $("#saveProfile").disabled=true;
+  try{
+    const p=await api("/api/profile",{method:"PUT",body:JSON.stringify({name,phone,alias})});
+    S.profile=p;save();renderProfileSummary();
+    msg.textContent=tr("Профиль сохранён.");msg.hidden=false;
+    setTimeout(()=>{$("#profileGate").hidden=true;},250);
+  }catch(e){
+    msg.textContent=String(e&&e.message||e);msg.hidden=false;
+  }finally{
+    $("#saveProfile").disabled=false;
+  }
+}
+
+
+const ACCESS_DEFAULT={
+  billing_plan:"free",effective_plan:"trial",trial_active:true,trial_remaining_seconds:30*86400,
+  unlimited:true,active_limit_seconds:null,break_seconds:0,active_seconds:0,remaining_seconds:null,
+  cooldown_remaining_seconds:0,session_active:false,limit_reached:false,can_start_shift:true,
+  can_accept_order:true,finish_current_order_only:false,
+  entitlements:{history_days:3650,personal_heatmap:true,crowd_heatmap:true,restaurant_analytics:true,waiting_zones:true}
+};
+let ACCESS=S.access||ACCESS_DEFAULT,accessAt=Date.now(),accessBusy=false;
+
+function accessRemaining(kind){
+  const elapsed=Math.floor((Date.now()-accessAt)/1000);
+  if(kind==="cooldown")return Math.max(0,(ACCESS.cooldown_remaining_seconds||0)-elapsed);
+  if(kind==="trial")return Math.max(0,(ACCESS.trial_remaining_seconds||0)-elapsed);
+  if(kind==="active"&&ACCESS.remaining_seconds!=null&&ACCESS.session_active&&!ACCESS.limit_reached)
+    return Math.max(0,(ACCESS.remaining_seconds||0)-elapsed);
+  return ACCESS.remaining_seconds;
+}
+function fmtLong(sec){
+  sec=Math.max(0,Math.floor(Number(sec)||0));
+  const d=Math.floor(sec/86400),h=Math.floor(sec%86400/3600),m=Math.floor(sec%3600/60);
+  if(d>0)return `${d} д ${h} ч`;
+  return `${String(h).padStart(2,"0")}:${String(m).padStart(2,"0")}:${String(sec%60).padStart(2,"0")}`;
+}
+function entitlement(k,def=false){
+  return ACCESS&&ACCESS.entitlements&&Object.prototype.hasOwnProperty.call(ACCESS.entitlements,k)?ACCESS.entitlements[k]:def;
+}
+function activeOrderExists(){
+  const sh=activeShift();return !!(sh&&shiftOrders(sh.id).some(o=>!o.deliveredAt));
+}
+function setAccess(a){
+  ACCESS=a||ACCESS_DEFAULT;S.access=ACCESS;accessAt=Date.now();save();renderAccess();applyEntitlements();
+}
+async function loadAccess(){
+  if(!SYNC_ON){setAccess(ACCESS_DEFAULT);return ACCESS}
+  try{const a=await api("/api/access/status");setAccess(a);return a}catch(e){console.warn("access",e);return ACCESS}
+}
+async function accessStart(){
+  if(!SYNC_ON)return ACCESS;
+  const a=await api("/api/access/start",{method:"POST",body:"{}"});setAccess(a);return a;
+}
+async function accessStop(){
+  if(!SYNC_ON)return ACCESS;
+  try{
+    const a=await api("/api/access/stop",{method:"POST",body:JSON.stringify({active_order:activeOrderExists()})});
+    setAccess(a);return a;
+  }catch(e){return ACCESS}
+}
+async function accessHeartbeat(){
+  if(!SYNC_ON||!activeShift()||accessBusy)return ACCESS;
+  accessBusy=true;
+  try{
+    const a=await api("/api/access/heartbeat",{method:"POST",body:JSON.stringify({active_order:activeOrderExists()})});
+    setAccess(a);
+    if(activeShift()&&!activeOrderExists()&&(a.cooldown_remaining_seconds||0)>0){
+      endShiftLocal("Лимит времени исчерпан. Начался обязательный перерыв.");
+    }
+    return a;
+  }catch(e){return ACCESS}
+  finally{accessBusy=false}
+}
+function planLabel(){
+  return ACCESS.effective_plan==="trial"?"TRIAL":String(ACCESS.effective_plan||"free").toUpperCase();
+}
+function renderAccess(){
+  const badge=$("#planBadge");if(badge)badge.textContent=planLabel();
+  let text="";
+  if(ACCESS.effective_plan==="trial"){
+    text=`30 дней без ограничений · осталось ${fmtLong(accessRemaining("trial"))}`;
+  }else if(ACCESS.unlimited){
+    text="Pro · без ограничений по времени";
+  }else if(accessRemaining("cooldown")>0){
+    text=`${planLabel()} · обязательный перерыв · доступ через ${fmtLong(accessRemaining("cooldown"))}`;
+  }else if(ACCESS.limit_reached&&activeOrderExists()){
+    text=`${planLabel()} · лимит исчерпан · заверши текущий заказ`;
+  }else{
+    text=`${planLabel()} · осталось ${fmtLong(accessRemaining("active"))} активного времени`;
+  }
+  if($("#planSummary"))$("#planSummary").textContent=text;
+  const note=$("#accessNote");
+  if(note){note.textContent=text;note.classList.toggle("warn",accessRemaining("cooldown")>0||ACCESS.finish_current_order_only)}
+  const sh=activeShift(),btn=$("#shiftBtn");
+  if(btn&&!sh){
+    const blocked=accessRemaining("cooldown")>0||(!ACCESS.unlimited&&ACCESS.limit_reached);
+    btn.disabled=blocked;
+    if(blocked)btn.textContent="Доступ через "+fmtLong(accessRemaining("cooldown"));
+    else btn.textContent="Начать смену";
+  }
+}
+function applyEntitlements(){
+  const map=!!entitlement("personal_heatmap",false);
+  if($("#mapLock"))$("#mapLock").hidden=map;
+  if($("#mapMainCard"))$("#mapMainCard").hidden=!map;
+  if($("#mapZonesCard"))$("#mapZonesCard").hidden=!map;
+  if($("#crowdChip"))$("#crowdChip").hidden=!(SYNC_ON&&entitlement("crowd_heatmap",false));
+  if($("#restaurantAnalyticsCard"))$("#restaurantAnalyticsCard").hidden=!entitlement("restaurant_analytics",false);
+}
+function showPlans(message){
+  $("#planMsg").hidden=!message;$("#planMsg").textContent=message||"";
+  $("#pricingGate").hidden=false;
+}
+$("#openPlans").addEventListener("click",()=>showPlans());
+$("#closePlans").addEventListener("click",()=>{$("#pricingGate").hidden=true});
+$("#mapUpgrade").addEventListener("click",()=>showPlans("Heatmap доступна начиная с Plus."));
+$("#pricingGate").addEventListener("click",e=>{if(e.target===$("#pricingGate"))$("#pricingGate").hidden=true});
+$$("[data-plan-info]").forEach(b=>b.addEventListener("click",()=>{
+  const p=b.dataset.planInfo;
+  if(p==="free"){showPlans("После 30-дневного trial аккаунт автоматически перейдёт на Free, если платный тариф не активирован.");return}
+  showPlans(`Тариф ${p==="plus"?"Plus — $9.99":"Pro — $19.99"} готов. Следующий шаг — подключить платёжного провайдера; пока тариф можно назначить из Admin Dashboard.`);
+}));
+
+
+const iso=t=>t?new Date(t).toISOString():null;
+const fin=v=>typeof v==="number"&&isFinite(v)?v:null;
+function shiftRow(x){return{id:x.id,start_at:iso(x.start),end_at:iso(x.end),km:+(+x.km||0).toFixed(2),vehicle:cfg().veh}}
+function orderRow(o){return{id:o.id,shift_id:o.shiftId||null,taken_at:iso(o.t),restaurant:o.restaurant?o.restaurant.slice(0,200):null,
+  address:o.address?o.address.slice(0,300):null,pay:fin(o.pay),pickup_km:fin(o.pk),delivery_km:fin(o.dl),zone:o.zone||null,
+  est_minutes:o.est?o.est.min:null,est_rate:o.est?o.est.rate:null,lat:fin(o.lat),lng:fin(o.lng),
+  arrived_at:iso(o.arrivedAt),picked_at:iso(o.pickedAt),delivered_at:iso(o.deliveredAt)}}
+async function sync(force){
+  if(!SYNC_ON||syncing)return;
+  if(!navigator.onLine){syncInfo={state:"offline",err:"",at:syncInfo.at};renderSync();return}
+  syncing=true;syncInfo.state="busy";renderSync();
+  try{
+    await token();
+    if(!S.syncedOnce){S.dirty=S.dirty||{o:{},s:{}};
+      S.shifts.filter(x=>!x.example).forEach(x=>S.dirty.s[x.id]=1);S.orders.filter(x=>!x.example).forEach(x=>S.dirty.o[x.id]=1)}
+    const d=S.dirty||{o:{},s:{}};
+    const snapS={...d.s},snapO={...d.o};
+    const sh=Object.keys(snapS).map(id=>S.shifts.find(x=>x.id===id)).filter(x=>x&&!x.example).map(shiftRow);
+    const os=Object.keys(snapO).map(id=>S.orders.find(x=>x.id===id)).filter(x=>x&&!x.example).map(orderRow);
+    for(let i=0;i<Math.max(sh.length,os.length);i+=500)
+      await api("/api/sync",{method:"POST",body:JSON.stringify({shifts:sh.slice(i,i+500),orders:os.slice(i,i+500)})});
+    for(const k in snapS)if(d.s[k]===snapS[k])delete d.s[k];
+    for(const k in snapO)if(d.o[k]===snapO[k])delete d.o[k];
+    S.syncedOnce=true;
+    if(force||Date.now()-(S.communityAt||0)>15*60e3){
+      const rows=await api("/api/community/waits");
+      S.community={};(rows||[]).forEach(r=>{S.community[r.restaurant]={avg:+r.avg_minutes,n:+r.visits,couriers:+r.couriers}});
+      S.communityAt=Date.now();
+    }
+    syncInfo={state:"ok",err:"",at:Date.now()};
+  }catch(e){syncInfo={state:"err",err:String(e&&e.message||e),at:syncInfo.at}}
+  syncing=false;save();renderSync();
+  if(pending()&&syncInfo.state==="ok")scheduleSync(2000);
+}
+async function loadCrowdZones(){
+  const H=new Date().getHours(),tz=(Intl.DateTimeFormat().resolvedOptions().timeZone)||"UTC";
+  if(S.crowd&&S.crowd.hour===H&&Date.now()-S.crowd.at<15*60e3)return S.crowd.cells;
+  const rows=await api("/api/community/zones?hour="+H+"&tz="+encodeURIComponent(tz));
+  S.crowd={hour:H,at:Date.now(),cells:(rows||[]).map(r=>({lat:+r.lat,lng:+r.lng,w:+r.orders,pay:0,restaurant:""}))};save();
+  return S.crowd.cells;
+}
+function syncLabel(){
+  if(!SYNC_ON)return null;
+  const n=pending();
+  if(syncInfo.state==="err")return["Облако: ошибка","bad"];
+  if(syncInfo.state==="offline"||!navigator.onLine)return[n?`Облако: ${n} ждут сети`:"Облако: нет сети","bad"];
+  if(syncInfo.state==="busy")return["Облако: отправляю","" ];
+  if(n)return[`Облако: ${n} в очереди`,""];
+  return["Облако: сохранено","ok"];
+}
+function renderSync(){
+  if(typeof renderPills==="function")renderPills();
+  const box=document.getElementById("cloudState");if(!box)return;
+  if(!SYNC_ON){box.innerHTML="Облако не подключено. Впиши адрес своего сервера в файл config.js и загрузи сайт заново.";return}
+  const l=syncLabel();
+  box.innerHTML=`<b>${esc(l[0])}</b>`+(syncInfo.at?`<br>Последняя отправка: ${new Date(syncInfo.at).toLocaleTimeString(locale(),{hour:"2-digit",minute:"2-digit"})}`:"")+
+    (syncInfo.err?`<br><span class="danger">${esc(syncInfo.err)}</span>`:"")+
+    (S.profile&&S.profile.complete?`<br>Курьер: <b>${esc(S.profile.name)}</b> · ${esc(S.profile.alias)}`:(S.auth&&S.auth.user_id?`<br>Код курьера: <span class="num">${esc(S.auth.user_id.slice(0,8))}</span>`:""))+
+    (S.community?`<br>Рестораны с общими данными об ожидании: ${Object.keys(S.community).length}`:"");
+}
+
+/* ---------- example data ---------- */
+function rng(seed){return function(){seed|=0;seed=seed+0x6D2B79F5|0;let t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+function seedExamples(){
+  const r=rng(42), g=()=>{let u=0,v=0;while(!u)u=r();while(!v)v=r();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v)};
+  const C=[
+    {n:"Бизнес-квартал",lat:32.0735,lng:34.7925,lunch:3,eve:0.8,rest:[["Суши Ями",7],["Салат-бар Грин",4],["Бургер Лаб",9]]},
+    {n:"Центр",lat:32.0795,lng:34.7745,lunch:2,eve:2.5,rest:[["Пицца Ромео",8],["Фалафель у Моше",3],["Хумусия Абу",5]]},
+    {n:"Порт",lat:32.0975,lng:34.7745,lunch:0.6,eve:2,rest:[["Рыбный дом",14],["Поке Шор",6]]},
+    {n:"Спальный север",lat:32.1105,lng:34.8005,lunch:0.5,eve:1.6,rest:[["Шуарма Хамшош",5],["Лапша Вок-Вок",11]]}
+  ];
+  const now=new Date();
+  for(let d=15;d>=1;d--){
+    if(r()<0.3)continue;
+    const day=new Date(now);day.setDate(now.getDate()-d);
+    const startH=[11,11.5,12,17,17.5,18][Math.floor(r()*6)];
+    const len=3+r()*2.5;
+    const start=new Date(day);start.setHours(0,0,0,0);
+    const st=start.getTime()+startH*3600e3, en=st+len*3600e3;
+    const id="ex"+d;
+    let km=0,t=st+5*60e3;
+    while(t<en-20*60e3){
+      const h=new Date(t).getHours(), lunch=h>=11&&h<15;
+      const w=C.map(c=>lunch?c.lunch:c.eve), tot=w.reduce((a,b)=>a+b,0);
+      let x=r()*tot,ci=0;while(x>w[ci]){x-=w[ci];ci++}
+      const c=C[ci], rs=c.rest[Math.floor(r()*c.rest.length)];
+      const pk=+(0.3+r()*2).toFixed(1), dl=+(1+r()*4).toFixed(1);
+      const pay=Math.round(18+dl*3.2+r()*8);
+      const wait=Math.max(1,rs[1]+g()*2.5);
+      const arrived=t+pk/20*3600e3, picked=arrived+wait*60e3, deliv=picked+(dl/20*3600e3)+3*60e3;
+      S.orders.push({id:id+"-"+t,shiftId:id,t,restaurant:rs[0],address:"",pay,pk,dl,zone:"center",
+        lat:c.lat+g()*0.0035,lng:c.lng+g()*0.0035,arrivedAt:arrived,pickedAt:picked,deliveredAt:deliv,example:true});
+      km+=pk+dl;
+      t=deliv+(4+r()*14)*60e3;
+    }
+    S.shifts.push({id,start:st,end:en,km:+(km*1.15).toFixed(1),example:true});
+  }
+}
+
+/* ---------- helpers ---------- */
+const cur=()=>cfg().cur||"₪";
+const money=v=>Math.round(v).toLocaleString(locale());
+const pad=n=>String(n).padStart(2,"0");
+function hms(ms){const s=Math.max(0,Math.floor(ms/1000));return pad(Math.floor(s/3600))+":"+pad(Math.floor(s%3600/60))+":"+pad(s%60)}
+const num=v=>{const x=parseFloat(String(v).replace(",","."));return isFinite(x)?x:NaN};
+function haversine(a,b){const R=6371,toR=Math.PI/180,dLat=(b[0]-a[0])*toR,dLng=(b[1]-a[1])*toR;
+  const h=Math.sin(dLat/2)**2+Math.cos(a[0]*toR)*Math.cos(b[0]*toR)*Math.sin(dLng/2)**2;return 2*R*Math.asin(Math.sqrt(h))}
+function dirName(dx,dy){const a=(Math.atan2(dx,dy)*180/Math.PI+360)%360;
+  return ["север","северо-восток","восток","юго-восток","юг","юго-запад","запад","северо-запад"][Math.round(a/45)%8]}
+function esc(s){return String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
+function plural(n,a,b,c){n=Math.abs(n)%100;const m=n%10;if(n>10&&n<20)return c;if(m>1&&m<5)return b;if(m===1)return a;return c}
+
+/* ---------- restaurant waits ---------- */
+function restWaits(cutoff=0){
+  const m={};
+  for(const o of S.orders){if(o.t<cutoff||!o.arrivedAt||!o.pickedAt||!o.restaurant)continue;
+    const k=o.restaurant.trim().toLowerCase();(m[k]=m[k]||{name:o.restaurant,sum:0,n:0,example:true});
+    m[k].sum+=(o.pickedAt-o.arrivedAt)/60e3;m[k].n++;if(!o.example)m[k].example=false}
+  return m;
+}
+function waitFor(name){
+  const k=(name||"").trim().toLowerCase();if(!k)return{min:cfg().wait,n:0};
+  const w=restWaits()[k], c=S.community&&S.community[k];
+  if(w&&(w.n>=2||!c))return{min:w.sum/w.n,n:w.n,src:"own"};
+  if(c)return{min:c.avg,n:c.n,src:"all"};
+  return{min:cfg().wait,n:0};
+}
+
+/* ---------- estimator ---------- */
+function estimate(o){
+  const c=cfg(), sp=Math.max(5,c.speed);
+  const pay=num(o.pay),pk=num(o.pk),dl=num(o.dl);
+  if(!(pay>0)||!(pk>=0)||!(dl>0))return null;
+  const w=waitFor(o.restaurant);
+  const tPk=pk/sp*60, tDl=dl/sp*60, back=o.zone==="far"?dl*0.6:0, tBack=back/sp*60;
+  const minutes=tPk+w.min+tDl+c.hand+tBack;
+  const cost=(pk+dl+back)*c.cost;
+  const net=pay-cost, rate=net/minutes*60;
+  const v=rate>=c.target?"go":rate>=c.target*0.8?"warn":"stop";
+  return{minutes,tPk,tDl,tBack,wait:w,cost,net,rate,v};
+}
+
+/* ---------- geolocation ---------- */
+let pos=null,geoState="off",watchId=null,wake=null;
+let lastGeoFix=null,gpsHeartbeat=null,gpsSending=false,lastGpsSent=0;
+
+function liveStatus(){
+  const sh=activeShift();
+  if(!sh)return "off_shift";
+  const open=shiftOrders(sh.id).filter(o=>!o.deliveredAt);
+  if(!open.length)return "waiting";
+  const o=open[0];
+  if(o.pickedAt)return "delivering";
+  if(o.arrivedAt)return "restaurant";
+  return "to_restaurant";
+}
+
+async function pushGps(fix,force){
+  if(!SYNC_ON||!fix||!activeShift()||gpsSending)return;
+  if(!force&&Date.now()-lastGpsSent<15000)return;
+  if(Date.now()-fix.seenAt>60000)return;
+  gpsSending=true;
+  try{
+    await api("/api/gps",{
+      method:"POST",
+      body:JSON.stringify({
+        shift_id:activeShift().id,
+        recorded_at:new Date().toISOString(),
+        lat:fix.lat,
+        lng:fix.lng,
+        accuracy:fin(fix.accuracy),
+        speed:fin(fix.speed),
+        status:liveStatus()
+      })
+    });
+    lastGpsSent=Date.now();
+  }catch(e){
+    // Live tracking must never interrupt the courier workflow.
+  }finally{
+    gpsSending=false;
+  }
+}
+function startGeo(){
+  if(!("geolocation" in navigator)){geoState="none";renderPills();return}
+  try{
+    watchId=navigator.geolocation.watchPosition(p=>{
+      const pt=[p.coords.latitude,p.coords.longitude];
+      geoState="ok";
+      const sh=activeShift();
+      if(sh&&pos&&p.coords.accuracy<60){const d=haversine(pos,pt);if(d>0.03&&d<2){sh.km=+((sh.km||0)+d).toFixed(3);save();markDirty("s",sh.id)}}
+      pos=pt;
+      lastGeoFix={lat:pt[0],lng:pt[1],accuracy:p.coords.accuracy,speed:p.coords.speed,seenAt:Date.now()};
+      pushGps(lastGeoFix,false);
+      renderPills();renderShiftStats();
+    },()=>{geoState="denied";renderPills()},{enableHighAccuracy:true,maximumAge:5000,timeout:20000});
+    if(!gpsHeartbeat)gpsHeartbeat=setInterval(()=>{
+      if(lastGeoFix&&Date.now()-lastGeoFix.seenAt<60000)pushGps(lastGeoFix,true);
+    },20000);
+  }catch(e){geoState="denied";renderPills()}
+}
+function stopGeo(){
+  if(watchId!==null){try{navigator.geolocation.clearWatch(watchId)}catch(e){}watchId=null}
+  if(gpsHeartbeat){clearInterval(gpsHeartbeat);gpsHeartbeat=null}
+  lastGeoFix=null;gpsSending=false;geoState="off";renderPills()
+}
+async function keepAwake(on){
+  try{if(on&&"wakeLock" in navigator){wake=await navigator.wakeLock.request("screen")}else if(wake){await wake.release();wake=null}}catch(e){}
+}
+
+/* ---------- shift ---------- */
+const activeShift=()=>S.active?S.shifts.find(s=>s.id===S.active):null;
+function shiftOrders(id){return S.orders.filter(o=>o.shiftId===id)}
+function endShiftLocal(message){
+  const sh=activeShift();if(!sh)return;
+  const open=shiftOrders(sh.id).filter(o=>!o.deliveredAt);
+  open.forEach(o=>{o.deliveredAt=Date.now();markDirty("o",o.id)});
+  sh.end=Date.now();S.active=null;save();markDirty("s",sh.id);sync();stopGeo();keepAwake(false);renderShift();
+  if(message){const m=$("#takeMsg");m.hidden=false;m.textContent=message}
+}
+async function toggleShift(){
+  const sh=activeShift();
+  if(sh){
+    await accessStop();
+    endShiftLocal();
+  }else{
+    try{
+      const a=await accessStart();
+      if(!a.can_start_shift){
+        renderAccess();
+        showPlans(`Сейчас действует обязательный перерыв. Новая смена будет доступна через ${fmtLong(accessRemaining("cooldown"))}.`);
+        return false;
+      }
+    }catch(e){
+      showPlans("Не удалось проверить подписку на сервере. Проверь интернет и попробуй ещё раз.");
+      return false;
+    }
+    const id="s"+Date.now();S.shifts.push({id,start:Date.now(),end:null,km:0});S.active=id;save();markDirty("s",id);
+    startGeo();keepAwake(true);
+  }
+  renderShift();renderAccess();
+  return true;
+}
+function renderPills(){
+  const sh=activeShift();
+  const g={ok:["GPS работает","ok"],denied:["GPS недоступен","bad"],none:["GPS нет","bad"],off:["GPS выключен",""]}[sh?geoState==="off"?"denied":geoState:"off"];
+  const sl=syncLabel();
+  $("#statusPills").innerHTML=`<span class="pill ${g[1]}">${g[0]}</span>`+(sl?`<span class="pill ${sl[1]}">${sl[0]}</span>`:"");
+}
+function renderShiftStats(){
+  const sh=activeShift();
+  const os=sh?shiftOrders(sh.id):[];
+  const earn=os.reduce((a,o)=>a+o.pay,0);
+  const ms=sh?Date.now()-sh.start:0;
+  $("#clock").textContent=hms(ms);
+  $("#sEarn").textContent=money(earn);
+  $("#sOrders").textContent=os.length;
+  $("#sKm").textContent=(sh?sh.km||0:0).toFixed(1);
+  $("#sRate").textContent=ms>10*60e3?money(earn/(ms/3600e3)):"—";
+}
+function renderShift(){
+  const sh=activeShift();
+  $("#shiftLabel").textContent=sh?"Смена с "+new Date(sh.start).toLocaleTimeString(locale(),{hour:"2-digit",minute:"2-digit"}):"Смена не начата";
+  const b=$("#shiftBtn");b.textContent=sh?"Завершить смену":"Начать смену";b.className=sh?"btn stop":"btn";
+  renderPills();renderShiftStats();
+  // active orders
+  const open=sh?shiftOrders(sh.id).filter(o=>!o.deliveredAt):[];
+  $("#activeCard").hidden=!open.length;
+  $("#activeList").innerHTML=open.map(o=>{
+    const step=o.pickedAt?2:o.arrivedAt?1:0;
+    const label=["Я у ресторана","Забрал заказ","Доставил"][step];
+    const sub=step===1?`Ждёшь <span class="num" data-since="${o.arrivedAt}">${hms(Date.now()-o.arrivedAt).slice(3)}</span>`:step===2?"Везёшь клиенту":"Едешь в ресторан";
+    return `<div class="order"><div class="order-h"><b>${esc(o.restaurant||"Заказ")}</b><span class="num" style="font-size:20px">${money(o.pay)} ${esc(cur())}</span></div>
+      <div class="small muted">${esc(o.address||"")}${o.address?" · ":""}${sub}</div>
+      <div class="steps"><i class="${step>=0?"on":""}"></i><i class="${step>=1?"on":""}"></i><i class="${step>=2?"on":""}"></i></div>
+      <button class="btn sm" data-step="${o.id}">${label}</button></div>`}).join("");
+  // zone hint
+  const h=$("#zoneHint");
+  if(!entitlement("waiting_zones",false)){h.hidden=true}
+  else{
+    const best=bestZones("now",1)[0];
+    if(best){h.hidden=false;h.innerHTML=`<div><b>Где ждать сейчас:</b> ${best.where}. В это время ты чаще всего брал заказы там — ${best.n} ${plural(best.n,"заказ","заказа","заказов")} в истории.</div>`}
+    else h.hidden=true;
+  }
+  renderAccess();
+}
+$("#shiftBtn").addEventListener("click",toggleShift);
+$("#activeList").addEventListener("click",async e=>{
+  const id=e.target.closest("[data-step]")?.dataset.step;if(!id)return;
+  const o=S.orders.find(x=>x.id===id);if(!o)return;
+  const t=Date.now();
+  if(!o.arrivedAt){o.arrivedAt=t;if(pos){o.lat=pos[0];o.lng=pos[1]}}
+  else if(!o.pickedAt){o.pickedAt=t;if(pos){o.lat=pos[0];o.lng=pos[1]}}
+  else o.deliveredAt=t;
+  save();markDirty("o",o.id);renderShift();
+  if(o.deliveredAt){
+    const a=await accessHeartbeat();
+    if(activeShift()&&!activeOrderExists()&&(a.cooldown_remaining_seconds||0)>0)endShiftLocal("Заказ завершён. Начался обязательный перерыв.");
+  }
+});
+
+/* ---------- order: parsing ---------- */
+const WORDNUM={"полкилометра":"0.5 км","пол километра":"0.5 км","полтора":"1.5","полторы":"1.5","один":"1","одна":"1","два":"2","две":"2","три":"3","четыре":"4","пять":"5","шесть":"6","семь":"7","восемь":"8","девять":"9","десять":"10"};
+function parsePhrase(text){
+  let s=" "+text.toLowerCase().replace(/ё/g,"е")+" ";
+  for(const [w,n] of Object.entries(WORDNUM))s=s.replace(new RegExp("(^|\\s)"+w+"(?=\\s)","g"),"$1"+n);
+  const N="(\\d+(?:[.,]\\d+)?)", U="\\s*(км|кило[а-яa-z]*|метр[а-яa-z]*|м)(?=[\\s,.;]|$)";
+  const toKm=(v,u)=>{v=num(v);return /^(метр|м$)/.test(u)?v/1000:v};
+  const out={};
+  const pkM=s.match(new RegExp("(?:до ресторана|до заведения|до точки|забрать|забор|подача|подъехать)[^\\d]{0,12}"+N+U));
+  const dlM=s.match(new RegExp("(?:доставк[а-яa-z]*|до клиента|до адреса|отвезти|везти|клиенту)[^\\d]{0,12}"+N+U));
+  if(pkM)out.pk=+toKm(pkM[1],pkM[2]).toFixed(2);
+  if(dlM)out.dl=+toKm(dlM[1],dlM[2]).toFixed(2);
+  if(out.pk==null||out.dl==null){
+    const all=[...s.matchAll(new RegExp(N+U,"g"))].map(m=>({v:+toKm(m[1],m[2]).toFixed(2),i:m.index}));
+    const used=[pkM&&pkM.index,dlM&&dlM.index];
+    const free=all.filter(a=>!(pkM&&s.indexOf(pkM[0])<=a.i&&a.i<s.indexOf(pkM[0])+pkM[0].length)&&!(dlM&&s.indexOf(dlM[0])<=a.i&&a.i<s.indexOf(dlM[0])+dlM[0].length));
+    if(out.pk==null&&free.length>1){out.pk=free.shift().v}
+    if(out.dl==null&&free.length){out.dl=free.shift().v}
+  }
+  const payM=s.match(new RegExp(N+"\\s*(шекел[а-яa-z]*|шек[а-яa-z]*|₪|руб[а-яa-z]*|евро|€|доллар[а-яa-z]*|\\$|лари|злот[а-яa-z]*|крон[а-яa-z]*|лев[а-яa-z]*|тенге)"))
+          ||s.match(new RegExp("(?:оплата|сумма|платят|заплатят|за)\\s*"+N+"(?!\\s*(?:км|кило|метр|м\\b))"));
+  if(payM)out.pay=num(payM[1]);
+  if(/окраин|пригород|далеко|за город|промзон/.test(s))out.zone="far";
+  // names: text before the first number-ish keyword
+  const cut=s.search(/(до ресторана|до заведения|до точки|забрать|забор|подача|доставк|до клиента|оплата|сумма|\d+(?:[.,]\d+)?\s*(км|кило|метр|шек|₪))/);
+  const head=(cut>0?text.slice(0,cut-1):text).replace(/[.;]+$/,"").trim();
+  let rest="",addr="";
+  const am=head.match(/^(.*?)(?:,|\s)\s*(?:адрес|на улиц\w*|улица|ул\.|на|в)\s+(.+)$/i);
+  const fm=head.match(/^из\s+(.+?)\s+(?:на|в|до)\s+(.+)$/i);
+  if(fm){rest=fm[1];addr=fm[2]}
+  else if(am){rest=am[1];addr=am[2]}
+  else{const parts=head.split(",").map(x=>x.trim()).filter(Boolean);rest=parts[0]||"";addr=parts.slice(1).join(", ")}
+  rest=rest.replace(/^(ресторан|заказ из|заказ|из)\s+/i,"").replace(/[,\s]+$/,"");
+  addr=addr.replace(/[,\s]+$/,"");
+  if(rest)out.restaurant=rest.charAt(0).toUpperCase()+rest.slice(1);
+  if(addr)out.address=addr.charAt(0).toUpperCase()+addr.slice(1);
+  return out;
+}
+
+function _cleanOcrLine(s){
+  return String(s||"").replace(/[|¦]/g,"I").replace(/\s+/g," ").trim();
+}
+function _numText(v){return num(String(v).replace(/[^\d.,]/g,""))}
+function parseWoltPhotoText(text){
+  const raw=String(text||"").replace(/\r/g,"");
+  const lines=raw.split(/\n+/).map(_cleanOcrLine).filter(Boolean);
+  const flat=lines.join(", ");
+  const out=parsePhrase(flat);
+
+  // Payment / payout. Prefer lines with payment context, then a plain shekel amount.
+  if(out.pay==null){
+    const payWords=/(payment|payout|earn|earnings|you get|you earn|fee|оплата|сумма|заработ|תשלום|שכר|תקבל|רווח|סה.?כ)/i;
+    let values=[];
+    for(const line of lines){
+      const ms=[...line.matchAll(/(?:₪\s*([\d.,]+)|([\d.,]+)\s*₪)/g)];
+      for(const m of ms){
+        const v=_numText(m[1]||m[2]);
+        if(isFinite(v)&&v>0&&v<2000)values.push({v,score:payWords.test(line)?3:1,line});
+      }
+    }
+    values.sort((a,b)=>b.score-a.score);
+    if(values.length)out.pay=values[0].v;
+  }
+
+  // Distances. Classify by pickup / delivery context when possible.
+  const dist=[];
+  const pickupWords=/(pickup|pick up|collect|restaurant|store|merchant|до ресторана|забрать|מסעדה|איסוף|בית עסק|חנות)/i;
+  const deliveryWords=/(delivery|drop.?off|customer|client|address|до клиента|достав|לקוח|מסירה|כתובת)/i;
+  for(const line of lines){
+    for(const m of line.matchAll(/([\d.,]+)\s*(km|км|ק["״']?מ)/ig)){
+      const v=_numText(m[1]);
+      if(!isFinite(v)||v<=0||v>100)continue;
+      dist.push({v,kind:pickupWords.test(line)?"pk":deliveryWords.test(line)?"dl":"",line});
+    }
+  }
+  if(out.pk==null){
+    const x=dist.find(d=>d.kind==="pk");
+    if(x)out.pk=x.v;
+  }
+  if(out.dl==null){
+    const x=dist.find(d=>d.kind==="dl");
+    if(x)out.dl=x.v;
+  }
+  const free=dist.filter(d=>(out.pk==null||Math.abs(d.v-out.pk)>.0001)&&(out.dl==null||Math.abs(d.v-out.dl)>.0001));
+  if(out.pk==null&&dist.length>=2)out.pk=dist[0].v;
+  if(out.dl==null){
+    const candidate=dist.find((d,i)=>i>0&&(out.pk==null||Math.abs(d.v-out.pk)>.0001));
+    if(candidate)out.dl=candidate.v;
+  }
+
+  // Restaurant: look after pickup/restaurant label.
+  if(!out.restaurant){
+    for(let i=0;i<lines.length;i++){
+      const l=lines[i];
+      const inline=l.match(/(?:restaurant|merchant|pickup|מסעדה|איסוף)\s*[:\-]?\s*(.{2,60})$/i);
+      if(inline&&inline[1]&&!/^\d/.test(inline[1])){out.restaurant=inline[1].trim();break}
+      if(/^(restaurant|merchant|pickup|מסעדה|איסוף)\b/i.test(l)&&lines[i+1]){
+        const n=lines[i+1];
+        if(!/[₪]|(?:\d+[.,]?\d*)\s*(?:km|км|ק["״']?מ)/i.test(n)){out.restaurant=n;break}
+      }
+    }
+  }
+
+  // Delivery address: look after address/dropoff/customer label.
+  if(!out.address){
+    for(let i=0;i<lines.length;i++){
+      const l=lines[i];
+      const inline=l.match(/(?:delivery address|drop.?off|address|כתובת|מסירה)\s*[:\-]?\s*(.{3,90})$/i);
+      if(inline&&inline[1]){out.address=inline[1].trim();break}
+      if(/^(delivery address|drop.?off|address|כתובת|מסירה)\b/i.test(l)&&lines[i+1]){
+        out.address=lines[i+1];break
+      }
+    }
+  }
+
+  return out;
+}
+
+let tesseractPromise=null;
+function loadTesseract(){
+  if(window.Tesseract)return Promise.resolve(window.Tesseract);
+  if(tesseractPromise)return tesseractPromise;
+  tesseractPromise=new Promise((resolve,reject)=>{
+    const s=document.createElement("script");
+    s.src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js";
+    s.async=true;
+    s.onload=()=>window.Tesseract?resolve(window.Tesseract):reject(new Error("OCR module did not load"));
+    s.onerror=()=>reject(new Error("OCR module could not be downloaded"));
+    document.head.appendChild(s);
+  });
+  return tesseractPromise;
+}
+function ocrProgress(p,text){
+  const pct=Math.max(0,Math.min(100,Math.round((p||0)*100)));
+  $("#ocrProgress i").style.width=pct+"%";
+  if(text)$("#photoStatus").textContent=text+(pct&&pct<100?" "+pct+"%":"");
+}
+async function scanOrderPhoto(file){
+  if(!file)return;
+  const panel=$("#photoPanel"),preview=$("#photoPreview"),cam=$("#cameraBtn");
+  panel.hidden=false;cam.classList.add("busy");
+  const objectUrl=URL.createObjectURL(file);
+  preview.src=objectUrl;
+  ocrProgress(.02,"Загружаю модуль распознавания…");
+  try{
+    const T=await loadTesseract();
+    ocrProgress(.05,"Распознаю заказ…");
+    const result=await T.recognize(file,"eng+heb",{
+      logger:m=>{
+        if(m&&typeof m.progress==="number"){
+          const label=m.status&&/recogniz/i.test(m.status)?"Распознаю заказ…":"Подготавливаю распознавание…";
+          ocrProgress(m.progress,label);
+        }
+      }
+    });
+    const text=(result&&result.data&&result.data.text||"").trim();
+    if(!text)throw new Error("No text detected");
+    $("#phrase").value=text.replace(/\n+/g,", ");
+    $("#transcript").textContent="Текст с фото: «"+text.replace(/\s+/g," ").slice(0,240)+(text.length>240?"…":"")+"»";
+    const parsed=parseWoltPhotoText(text);
+    fillForm(parsed);
+    const found=[parsed.restaurant,parsed.address,parsed.pay,parsed.pk,parsed.dl].filter(v=>v!==undefined&&v!==null&&String(v).trim()!=="").length;
+    ocrProgress(1,found>=4?"Заказ распознан. Проверь данные перед подтверждением.":"На фото удалось распознать не все поля. Проверь заполненные данные.");
+  }catch(e){
+    console.error("Order photo OCR failed",e);
+    ocrProgress(0,"Не удалось распознать фото. Попробуй ещё раз или введи данные вручную.");
+  }finally{
+    cam.classList.remove("busy");
+    setTimeout(()=>URL.revokeObjectURL(objectUrl),30000);
+  }
+}
+$("#cameraBtn").addEventListener("click",()=>$("#cameraInput").click());
+$("#galleryBtn").addEventListener("click",()=>$("#galleryInput").click());
+$("#photoRetry").addEventListener("click",()=>$("#cameraInput").click());
+$("#photoClose").addEventListener("click",()=>{$("#photoPanel").hidden=true});
+$("#cameraInput").addEventListener("change",e=>{const f=e.target.files&&e.target.files[0];e.target.value="";if(f)scanOrderPhoto(f)});
+$("#galleryInput").addEventListener("change",e=>{const f=e.target.files&&e.target.files[0];e.target.value="";if(f)scanOrderPhoto(f)});
+
+async function importSharedOrderImage(){
+  const params=new URLSearchParams(location.search);
+  if(params.get("shared-order-error")==="1"){
+    show("order");
+    const msg=$("#micMsg");
+    if(msg){msg.hidden=false;msg.textContent="Не удалось получить изображение из Android Share. Попробуй поделиться скриншотом ещё раз."}
+    history.replaceState({},"",location.pathname);
+    return;
+  }
+  if(params.get("shared-order")!=="1")return;
+
+  show("order");
+  const panel=$("#photoPanel");
+  const status=$("#photoStatus");
+  if(panel)panel.hidden=false;
+  if(status)status.textContent="Получаю скриншот Wolt…";
+
+  try{
+    if(!("caches" in window))throw new Error("Cache Storage unavailable");
+    const cache=await caches.open("shiftpilot-share-v1");
+    const key="/__shared-order-image";
+    const response=await cache.match(key);
+    if(!response)throw new Error("Shared image not found");
+
+    const blob=await response.blob();
+    const encoded=response.headers.get("X-ShiftPilot-Filename")||"";
+    let filename="wolt-order.png";
+    try{if(encoded)filename=decodeURIComponent(encoded)}catch(e){}
+    const file=new File([blob],filename,{type:blob.type||response.headers.get("Content-Type")||"image/png"});
+
+    // Remove the sensitive screenshot from local cache before OCR starts.
+    await cache.delete(key);
+
+    history.replaceState({},"",location.pathname);
+    await scanOrderPhoto(file);
+  }catch(e){
+    console.error("Shared Wolt screenshot import failed",e);
+    history.replaceState({},"",location.pathname);
+    if(status)status.textContent="Не удалось открыть скриншот. Попробуй Share → ShiftPilot ещё раз.";
+    const msg=$("#micMsg");
+    if(msg){msg.hidden=false;msg.textContent="Ошибка импорта скриншота Wolt."}
+  }
+}
+
+
+let zone="center";
+function fillForm(p){
+  if(p.restaurant!=null)$("#fRest").value=p.restaurant;
+  if(p.address!=null)$("#fAddr").value=p.address;
+  if(p.pay!=null)$("#fPay").value=p.pay;
+  if(p.pk!=null)$("#fPk").value=p.pk;
+  if(p.dl!=null)$("#fDl").value=p.dl;
+  setZone(p.zone||"center");
+  renderVerdict();
+}
+function setZone(z){zone=z;$$("#zoneSeg button").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.z===z)));renderVerdict()}
+$("#zoneSeg").addEventListener("click",e=>{const b=e.target.closest("button");if(b)setZone(b.dataset.z)});
+function formOrder(){return{restaurant:$("#fRest").value.trim(),address:$("#fAddr").value.trim(),pay:$("#fPay").value,pk:$("#fPk").value,dl:$("#fDl").value,zone}}
+function renderVerdict(){
+  const o=formOrder(), e=estimate(o), box=$("#verdict"), c=cfg();
+  if(!e){box.className="verdict idle";$("#vWord").textContent="Жду заказ";$("#vRate").innerHTML="";
+    $("#vWhy").textContent="Заполни оплату и расстояния, и я посчитаю доход в час.";$("#vBreak").hidden=true;return}
+  box.className="verdict "+e.v;
+  $("#vWord").textContent={go:"Берём",warn:"На грани",stop:"Не берём"}[e.v];
+  $("#vRate").innerHTML=`${money(e.rate)}<small> ${esc(cur())}/ч</small>`;
+  const sh=activeShift();let cmp="";
+  if(sh){const os=shiftOrders(sh.id),ms=Date.now()-sh.start;if(ms>20*60e3&&os.length){const r=os.reduce((a,x)=>a+x.pay,0)/(ms/3600e3);cmp=` Сейчас в смене у тебя ${money(r)} ${cur()}/ч.`}}
+  const diff=e.rate-c.target;
+  $("#vWhy").textContent=(e.v==="go"?`Выше цели на ${money(diff)} ${cur()}/ч.`:e.v==="warn"?`Чуть ниже цели ${money(c.target)} ${cur()}/ч. Бери, если рядом нет лучших заказов.`:`Ниже цели на ${money(-diff)} ${cur()}/ч.`)+cmp;
+  const wl=e.wait.n?`ожидание (${e.wait.src==="all"?"курьеры, ":""}${e.wait.n} ${plural(e.wait.n,"визит","визита","визитов")})`:"ожидание (нет истории)";
+  $("#vBreak").hidden=false;
+  $("#vBreak").innerHTML=`<span>Дорога до ресторана</span><span>${Math.round(e.tPk)} мин</span>
+    <span>${wl}</span><span>${Math.round(e.wait.min)} мин</span>
+    <span>Доставка</span><span>${Math.round(e.tDl)} мин</span>
+    <span>Передача клиенту</span><span>${Math.round(c.hand)} мин</span>
+    ${e.tBack?`<span>Возврат в зону заказов</span><span>${Math.round(e.tBack)} мин</span>`:""}
+    <span class="sep"></span>
+    <span>Всего времени</span><span>${Math.round(e.minutes)} мин</span>
+    <span>Расходы на дорогу</span><span>${e.cost.toFixed(1)} ${esc(cur())}</span>
+    <span>Чистыми</span><span>${e.net.toFixed(1)} ${esc(cur())}</span>`;
+}
+["#fRest","#fAddr","#fPay","#fPk","#fDl"].forEach(id=>$(id).addEventListener("input",renderVerdict));
+$("#parseBtn").addEventListener("click",()=>{const t=$("#phrase").value.trim();if(t){$("#transcript").textContent="«"+t+"»";fillForm(parsePhrase(t))}});
+function clearForm(){["#fRest","#fAddr","#fPay","#fPk","#fDl","#phrase"].forEach(id=>$(id).value="");$("#transcript").textContent="";setZone("center")}
+$("#clearBtn").addEventListener("click",()=>{clearForm();$("#takeMsg").hidden=true});
+$("#takeBtn").addEventListener("click",async ()=>{
+  const o=formOrder(),e=estimate(o),m=$("#takeMsg");
+  if(!e){m.hidden=false;m.textContent="Нужны оплата и оба расстояния, чтобы записать заказ.";return}
+  if(!activeShift()){const started=await toggleShift();if(!started||!activeShift())return}
+  const gate=await accessHeartbeat();
+  if(!gate.can_accept_order){
+    m.hidden=false;m.textContent="Лимит активного времени исчерпан. Новый заказ можно взять после обязательного перерыва.";
+    showPlans(m.textContent);return;
+  }
+  const sh=activeShift();
+  const oid="o"+Date.now();
+  S.orders.push({id:oid,shiftId:sh.id,t:Date.now(),restaurant:o.restaurant,address:o.address,pay:num(o.pay),pk:num(o.pk),dl:num(o.dl),zone:o.zone,
+    est:{min:Math.round(e.minutes),rate:Math.round(e.rate)},lat:pos?pos[0]:null,lng:pos?pos[1]:null});
+  save();markDirty("o",oid);clearForm();m.hidden=true;renderAccess();applyEntitlements();show("shift");
+setTimeout(()=>importSharedOrderImage(),450);
+});
+
+/* ---------- voice ---------- */
+const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+let rec=null,listening=false;
+function micMsg(t){const m=$("#micMsg");m.hidden=!t;m.textContent=t||""}
+$("#micBtn").addEventListener("click",()=>{
+  if(!SR){micMsg("Этот браузер не умеет распознавать речь. Напиши фразу текстом ниже или открой приложение в Chrome.");return}
+  if(listening){try{rec.stop()}catch(e){}return}
+  rec=new SR();const SPEECH_LANG={en:"en-US",ru:"ru-RU",he:"he-IL"};rec.lang=SPEECH_LANG[cfg().lang]||"en-US";rec.interimResults=true;rec.maxAlternatives=1;rec.continuous=false;
+  let finalText="";
+  rec.onstart=()=>{listening=true;$("#micBtn").classList.add("live");micMsg("");$("#transcript").textContent="Слушаю…"};
+  rec.onresult=ev=>{let t="";for(const r of ev.results){t+=r[0].transcript}finalText=t;$("#transcript").textContent="«"+t+"»"};
+  rec.onerror=ev=>{micMsg(ev.error==="not-allowed"||ev.error==="service-not-allowed"
+    ?"Нет доступа к микрофону. В предпросмотре он заблокирован; в установленном приложении разреши микрофон. Пока можно написать фразу текстом."
+    :ev.error==="no-speech"?"Ничего не услышал. Нажми и скажи ещё раз.":"Распознавание не сработало ("+ev.error+"). Попробуй ещё раз или напиши текстом.")};
+  rec.onend=()=>{listening=false;$("#micBtn").classList.remove("live");if(finalText){$("#phrase").value=finalText;fillForm(parsePhrase(finalText))}else if($("#transcript").textContent==="Слушаю…")$("#transcript").textContent=""};
+  try{rec.start()}catch(e){micMsg("Не удалось включить микрофон. Напиши фразу текстом.")}
+});
+
+/* ---------- log ---------- */
+function shiftHours(sh){return((sh.end||Date.now())-sh.start)/3600e3}
+function renderLog(){
+  const c=cfg(), days=Math.max(1,Number(entitlement("history_days",7))||7), cutoff=Date.now()-days*864e5;
+  const ws=S.shifts.filter(s=>s.start>=cutoff);
+  const wo=S.orders.filter(o=>o.t>=cutoff);
+  if($("#logPeriodLabel"))$("#logPeriodLabel").textContent=days>=3650?"Вся история":`Последние ${days} дней`;
+  const earn=wo.reduce((a,o)=>a+o.pay,0), hrs=ws.reduce((a,s)=>a+shiftHours(s),0);
+  $("#wEarn").textContent=money(earn)+" "+cur();
+  $("#wHours").textContent=hrs.toFixed(1);
+  $("#wOrders").textContent=wo.length;
+  $("#wRate").textContent=hrs>0.2?money(earn/hrs)+" "+cur():"—";
+  const hasEx=S.orders.some(o=>o.example);
+  const en=$("#exampleNote");en.hidden=!hasEx;
+  if(hasEx)en.innerHTML=`<div>Сейчас здесь <b>примерные смены</b>, чтобы было видно, как работает аналитика. Удалить их можно в настройках — твои настоящие смены останутся.</div>`;
+  // by hour
+  const time=new Array(24).fill(0),pay=new Array(24).fill(0);
+  for(const s of ws){const e=s.end||Date.now();for(let t=s.start;t<e;t+=5*60e3)time[new Date(t).getHours()]+=5/60}
+  for(const o of wo)pay[new Date(o.t).getHours()]+=o.pay;
+  const hours=[];for(let h=0;h<24;h++)if(time[h]>=0.4)hours.push({h,rate:pay[h]/time[h],n:time[h]});
+  $("#hourChart").innerHTML=hours.length?hourChart(hours,c.target):`<div class="small muted">Отработай пару смен, и здесь появится график.</div>`;
+  // restaurants
+  const rw=entitlement("restaurant_analytics",false)?Object.values(restWaits(cutoff)).filter(r=>r.n>=1).map(r=>({...r,avg:r.sum/r.n})).sort((a,b)=>b.avg-a.avg).slice(0,8):[];
+  const mx=Math.max(1,...rw.map(r=>r.avg));
+  $("#restTable").innerHTML=rw.length?`<tr><th>Ресторан</th><th class="r">Ждёшь</th><th style="width:30%"></th><th class="r">Визитов</th></tr>`+
+    rw.map(r=>`<tr><td>${esc(r.name)}${r.example?'<span class="tag">пример</span>':""}</td><td class="r num" style="font-size:18px">${r.avg.toFixed(0)} мин</td><td style="vertical-align:middle"><div class="bar-in" style="width:${(r.avg/mx*100).toFixed(0)}%;${r.avg<6?"background:var(--go)":""}"></div></td><td class="r">${r.n}</td></tr>`).join("")
+    :`<tr><td class="muted">Отмечай «Я у ресторана» и «Забрал заказ» — так посчитается ожидание.</td></tr>`;
+  // shifts
+  const sl=[...ws].sort((a,b)=>b.start-a.start).slice(0,20);
+  $("#shiftTable").innerHTML=`<tr><th>Дата</th><th class="r">Часы</th><th class="r">Заказы</th><th class="r">${esc(cur())}</th><th class="r">${esc(cur())}/ч</th></tr>`+
+    sl.map(s=>{const os=shiftOrders(s.id),e=os.reduce((a,o)=>a+o.pay,0),h=shiftHours(s),r=h>0.1?e/h:0;
+      const d=new Date(s.start);
+      return `<tr><td>${d.toLocaleDateString(locale(),{weekday:"short",day:"numeric",month:"short"})} ${pad(d.getHours())}:${pad(d.getMinutes())}${s.example?'<span class="tag">пример</span>':""}${s.end?"":'<span class="tag">идёт</span>'}</td>
+      <td class="r">${h.toFixed(1)}</td><td class="r">${os.length}</td><td class="r">${money(e)}</td>
+      <td class="r" style="font-weight:600;color:${r>=c.target?"var(--go)":r>=c.target*.8?"var(--warn)":"var(--stop)"}">${money(r)}</td></tr>`}).join("");
+}
+function hourChart(hours,target){
+  const W=560,H=220,L=36,R=8,T=14,B=28;
+  const maxV=Math.max(target*1.15,...hours.map(h=>h.rate));
+  const step=maxV>150?50:maxV>60?20:10, top=Math.ceil(maxV/step)*step;
+  const y=v=>T+(H-T-B)*(1-v/top);
+  const bw=(W-L-R)/hours.length;
+  let g="";
+  for(let v=0;v<=top;v+=step)g+=`<line x1="${L}" x2="${W-R}" y1="${y(v)}" y2="${y(v)}" stroke="var(--grid)"/><text x="${L-6}" y="${y(v)+4}" text-anchor="end" font-size="11" fill="var(--muted)">${v}</text>`;
+  const bars=hours.map((h,i)=>{const x=L+i*bw+bw*.18,w=bw*.64,col=h.rate>=target?"var(--go)":h.rate>=target*.8?"var(--warn)":"var(--stop)";
+    return `<rect x="${x}" y="${y(h.rate)}" width="${w}" height="${y(0)-y(h.rate)}" rx="3" fill="${col}"><title>${h.h}:00 — ${Math.round(h.rate)} ${cur()}/ч, ${h.n.toFixed(1)} ч</title></rect>
+    <text x="${x+w/2}" y="${H-B+16}" text-anchor="middle" font-size="11" fill="var(--muted)">${h.h}</text>`}).join("");
+  const ty=y(target);
+  return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Доход в час по часам суток">${g}${bars}
+    <line x1="${L}" x2="${W-R}" y1="${ty}" y2="${ty}" stroke="var(--ink)" stroke-dasharray="5 4" stroke-width="1.5"/>
+    <text x="${W-R}" y="${ty-5}" text-anchor="end" font-size="11" font-weight="600" fill="var(--ink)">цель ${target}</text></svg>`;
+}
+
+/* ---------- heatmap ---------- */
+let mapMode="now";
+const CELL=0.4;
+function mapPoints(mode){
+  const now=new Date(),H=now.getHours(),days=Math.max(1,Number(entitlement("history_days",7))||7),cutoff=Date.now()-days*864e5;
+  return S.orders.filter(o=>o.t>=cutoff&&o.lat!=null&&o.lng!=null).filter(o=>{
+    if(mode==="all")return true;
+    const d=new Date(o.t),dh=Math.min(Math.abs(d.getHours()-H),24-Math.abs(d.getHours()-H));
+    return dh<=1;
+  });
+}
+function grid(pts){
+  if(!pts.length)return null;
+  const lat0=pts.reduce((a,p)=>a+p.lat,0)/pts.length, lng0=pts.reduce((a,p)=>a+p.lng,0)/pts.length;
+  const kx=111.32*Math.cos(lat0*Math.PI/180), ky=110.57;
+  const cells={};
+  for(const p of pts){const x=(p.lng-lng0)*kx,y=(p.lat-lat0)*ky,i=Math.floor(x/CELL),j=Math.floor(y/CELL),k=i+","+j;
+    (cells[k]=cells[k]||{i,j,n:0,pay:0,rests:{}});cells[k].n+=(p.w||1);cells[k].pay+=(p.pay||0);if(p.restaurant)cells[k].rests[p.restaurant]=(cells[k].rests[p.restaurant]||0)+1}
+  return{lat0,lng0,kx,ky,cells:Object.values(cells)};
+}
+function bestZones(mode,k){
+  let G=grid(mode==="crowd"?(crowdCells||[]):mapPoints(mode));
+  if(!G&&mode==="now")G=grid(mapPoints("all"));
+  if(!G)return[];
+  const me=pos?{x:(pos[1]-G.lng0)*G.kx,y:(pos[0]-G.lat0)*G.ky}:null;
+  return G.cells.sort((a,b)=>b.n-a.n).slice(0,k).map(c=>{
+    const cx=(c.i+.5)*CELL,cy=(c.j+.5)*CELL;
+    const topR=Object.entries(c.rests).sort((a,b)=>b[1]-a[1]).slice(0,2).map(r=>r[0]).filter(Boolean);
+    let where;
+    if(me){const dx=cx-me.x,dy=cy-me.y,d=Math.hypot(dx,dy);where=d<0.3?"прямо тут, где ты сейчас":`${d.toFixed(1)} км на ${dirName(dx,dy)} от тебя`}
+    else where=topR.length?"у "+topR.join(" и "):`точка ${(G.lat0+cy/G.ky).toFixed(4)}, ${(G.lng0+cx/G.kx).toFixed(4)}`;
+    return{...c,where,topR,cx,cy};
+  });
+}
+function cssVar(n){return getComputedStyle(document.documentElement).getPropertyValue(n).trim()}
+function hex2rgb(h){h=h.replace("#","");if(h.length===3)h=h.split("").map(x=>x+x).join("");const v=parseInt(h,16);return[v>>16&255,v>>8&255,v&255]}
+function ramp(t){const a=hex2rgb(cssVar("--heat1")),b=hex2rgb(cssVar("--heat2")),c=hex2rgb(cssVar("--heat3"));
+  const [p,q,u]=t<.5?[a,b,t*2]:[b,c,(t-.5)*2];return`rgb(${p.map((v,i)=>Math.round(v+(q[i]-v)*u)).join(",")})`}
+let crowdCells=null,crowdErr="";
+function renderMap(){
+  if(mapMode==="crowd"&&crowdCells===null){$("#mapCaption").textContent="Загружаю данные всех курьеров…";
+    loadCrowdZones().then(c=>{crowdCells=c;crowdErr=""}).catch(e=>{crowdCells=[];crowdErr=String(e.message||e)}).then(()=>{if(mapMode==="crowd")renderMap()});return}
+  const cv=$("#heat"),box=cv.parentElement,W=box.clientWidth-32||320,Hh=Math.min(460,Math.round(W*0.95)),dpr=window.devicePixelRatio||1;
+  cv.width=W*dpr;cv.height=Hh*dpr;cv.style.height=Hh+"px";
+  const ctx=cv.getContext("2d");ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,W,Hh);
+  const pts=mapMode==="crowd"?(crowdCells||[]):mapPoints(mapMode),G=grid(pts);
+  const now=new Date();
+  $("#mapCaption").textContent=mapMode==="crowd"?(crowdErr||`Все курьеры за 60 дней, ±1 час от текущего времени: ${pts.reduce((a,p)=>a+(p.w||1),0)} заказов. Показаны места от 3 заказов.`):mapMode==="now"?`Заказы, взятые с ${pad((now.getHours()+23)%24)}:00 до ${pad((now.getHours()+2)%24)}:00 в любые дни: ${pts.length}.`:`Все заказы с отметкой места: ${pts.length}.`;
+  const zl=$("#zoneList");
+  if(!G){ctx.fillStyle=cssVar("--muted");ctx.font="15px Barlow, system-ui";ctx.textAlign="center";
+    ctx.fillText("Пока нет заказов с GPS-отметкой.",W/2,Hh/2-8);ctx.fillText("Включи смену и отмечай «Забрал заказ».",W/2,Hh/2+14);
+    zl.innerHTML=`<div class="small muted">Зоны появятся после первых заказов с GPS.</div>`;return}
+  const xs=G.cells.map(c=>c.i),ys=G.cells.map(c=>c.j);
+  let i0=Math.min(...xs)-1,i1=Math.max(...xs)+1,j0=Math.min(...ys)-1,j1=Math.max(...ys)+1;
+  let me=null;if(pos){me={x:(pos[1]-G.lng0)*G.kx/CELL,y:(pos[0]-G.lat0)*G.ky/CELL};i0=Math.min(i0,Math.floor(me.x)-1);i1=Math.max(i1,Math.floor(me.x)+1);j0=Math.min(j0,Math.floor(me.y)-1);j1=Math.max(j1,Math.floor(me.y)+1)}
+  const pad2=18,cs=Math.min((W-pad2*2)/(i1-i0+1),(Hh-pad2*2)/(j1-j0+1));
+  const ox=(W-cs*(i1-i0+1))/2,oy=(Hh-cs*(j1-j0+1))/2;
+  const X=i=>ox+(i-i0)*cs,Y=j=>oy+(j1-j)*cs;
+  ctx.strokeStyle=cssVar("--grid");ctx.lineWidth=1;
+  for(let i=i0;i<=i1+1;i++){ctx.beginPath();ctx.moveTo(X(i),oy);ctx.lineTo(X(i),oy+cs*(j1-j0+1));ctx.stroke()}
+  for(let j=j0-1;j<=j1;j++){ctx.beginPath();ctx.moveTo(ox,Y(j));ctx.lineTo(ox+cs*(i1-i0+1),Y(j));ctx.stroke()}
+  const mx=Math.max(...G.cells.map(c=>c.n));
+  for(const c of G.cells){const t=Math.sqrt(c.n/mx);ctx.fillStyle=ramp(t);ctx.fillRect(X(c.i)+1,Y(c.j)+1,cs-2,cs-2)}
+  const best=bestZones(mapMode,3);
+  ctx.font=`700 ${Math.max(12,Math.min(20,cs*.5))}px "Barlow Condensed", sans-serif`;ctx.textAlign="center";ctx.textBaseline="middle";
+  best.forEach((b,k)=>{ctx.fillStyle="#fff";ctx.strokeStyle="rgba(0,0,0,.45)";ctx.lineWidth=3;const x=X(b.i)+cs/2,y=Y(b.j)+cs/2;ctx.strokeText(String(k+1),x,y);ctx.fillText(String(k+1),x,y)});
+  if(me){const x=ox+(me.x-i0)*cs,y=oy+(j1+1-me.y)*cs;ctx.beginPath();ctx.arc(x,y,8,0,Math.PI*2);ctx.fillStyle=cssVar("--accent");ctx.fill();ctx.lineWidth=3;ctx.strokeStyle=cssVar("--surface");ctx.stroke()}
+  // scale bar + north
+  const oneKm=cs/CELL;ctx.strokeStyle=cssVar("--ink");ctx.fillStyle=cssVar("--ink");ctx.lineWidth=2;
+  ctx.beginPath();ctx.moveTo(12,Hh-12);ctx.lineTo(12+oneKm,Hh-12);ctx.moveTo(12,Hh-16);ctx.lineTo(12,Hh-8);ctx.moveTo(12+oneKm,Hh-16);ctx.lineTo(12+oneKm,Hh-8);ctx.stroke();
+  ctx.font="600 12px Barlow, sans-serif";ctx.textAlign="left";ctx.textBaseline="bottom";ctx.fillText(tr("1 км"),14,Hh-16);
+  ctx.textAlign="right";ctx.textBaseline="top";ctx.fillText(tr("↑ С"),W-10,8);
+  zl.innerHTML=best.map((b,k)=>`<div class="zone"><div class="n">${k+1}</div><div style="min-width:0"><div style="font-weight:600">${esc(b.where)}</div><div class="small muted">${esc(b.topR.join(", "))}</div></div><div class="num" style="font-size:20px">${b.n}<span class="small muted" style="font-family:var(--f-body);font-weight:500"> зак.</span></div></div>`).join("");
+}
+$("#mapFilter").addEventListener("click",e=>{const b=e.target.closest(".chip");if(!b)return;mapMode=b.dataset.f;if(mapMode==="crowd"&&S.crowd&&S.crowd.hour!==new Date().getHours())crowdCells=null;$$("#mapFilter .chip").forEach(c=>c.setAttribute("aria-pressed",String(c===b)));renderMap()});
+
+/* ---------- settings ---------- */
+$("#editProfile").addEventListener("click",()=>openProfileEditor(S.profile||{},false));
+$("#saveProfile").addEventListener("click",saveProfile);
+$("#cancelProfile").addEventListener("click",()=>{$("#profileGate").hidden=true});
+function fillSettings(){renderProfileSummary();const c=cfg();if($("#sLang"))$("#sLang").value=c.lang||"en";$("#sVeh").value=c.veh;$("#sSpeed").value=c.speed;$("#sCost").value=c.cost;$("#sTarget").value=c.target;$("#sCur").value=c.cur;$("#sWait").value=c.wait;$("#sHand").value=c.hand}
+$("#sVeh").addEventListener("change",e=>{const v=VEH[e.target.value];$("#sSpeed").value=v.speed;$("#sCost").value=v.cost});
+$("#saveSettings").addEventListener("click",()=>{
+  const c=cfg(),f=(id,d)=>{const v=num($(id).value);return isFinite(v)&&v>=0?v:d};
+  c.lang=$("#sLang").value;c.veh=$("#sVeh").value;c.speed=f("#sSpeed",c.speed)||c.speed;c.cost=f("#sCost",c.cost);c.target=f("#sTarget",c.target)||c.target;
+  c.cur=$("#sCur").value.trim()||"₪";c.wait=f("#sWait",c.wait);c.hand=f("#sHand",c.hand);save();applyCur();if(window.CourierI18n)window.CourierI18n.apply(c.lang);$("#dataMsg").textContent="Настройки сохранены.";
+});
+$("#clearExamples").addEventListener("click",()=>{S.orders=S.orders.filter(o=>!o.example);S.shifts=S.shifts.filter(s=>!s.example);save();$("#dataMsg").textContent="Примеры удалены."});
+$("#resetAll").addEventListener("click",()=>{$("#resetConfirm").hidden=false});
+$("#syncNow").addEventListener("click",()=>sync(true));
+$("#resetNo").addEventListener("click",()=>{$("#resetConfirm").hidden=true});
+$("#resetYes").addEventListener("click",()=>{S={settings:cfg(),shifts:[],orders:[],active:null,auth:S.auth,community:S.community,communityAt:S.communityAt,syncedOnce:S.syncedOnce,dirty:{o:{},s:{}}};save();stopGeo();$("#resetConfirm").hidden=true;$("#dataMsg").textContent="Все смены стёрты."});
+function applyCur(){$$(".cur").forEach(e=>e.textContent=cur())}
+
+/* ---------- navigation ---------- */
+let current="shift";
+function show(t){
+  current=t;
+  ["shift","order","log","map","settings"].forEach(x=>$("#tab-"+x).hidden=x!==t);
+  $$("nav.tabs button").forEach(b=>b.setAttribute("aria-selected",String(b.dataset.tab===t)));
+  if(t==="shift")renderShift();if(t==="order")renderVerdict();if(t==="log")renderLog();if(t==="map"){applyEntitlements();renderMap()}if(t==="settings"){fillSettings();renderSync();renderAccess()}
+  window.scrollTo(0,0);
+}
+$$("nav.tabs button").forEach(b=>b.addEventListener("click",()=>show(b.dataset.tab)));
+$("#openSettings").addEventListener("click",()=>show("settings"));
+$("#closeSettings").addEventListener("click",()=>show("shift"));
+setInterval(()=>{
+  if(current==="shift"&&activeShift()){renderShiftStats();$$("[data-since]").forEach(e=>e.textContent=hms(Date.now()-+e.dataset.since).slice(3))}
+  renderAccess();
+},1000);
+setInterval(()=>{if(activeShift())accessHeartbeat()},30000);
+window.addEventListener("resize",()=>{if(current==="map")renderMap()});
+try{matchMedia("(prefers-color-scheme: dark)").addEventListener("change",()=>{if(current==="map")renderMap()})}catch(e){}
+new MutationObserver(()=>{if(current==="map")renderMap()}).observe(document.documentElement,{attributes:true,attributeFilter:["data-theme"]});
+document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible"&&activeShift())keepAwake(true)});
+
+applyCur();
+if(window.CourierI18n)window.CourierI18n.apply(cfg().lang||"en");
+if(activeShift()){startGeo();setTimeout(()=>accessStart().catch(()=>{}),2100)}
+if(SYNC_ON){window.addEventListener("online",()=>sync());window.addEventListener("offline",renderSync);
+  setInterval(()=>{if(pending())sync()},60e3);document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="hidden"&&pending())sync()});
+  setTimeout(()=>sync(),1200);setTimeout(()=>loadProfile(true).catch(()=>{}),1600);setTimeout(()=>loadAccess().catch(()=>{}),1900)}
+// demo order so the verdict panel shows what it does
+fillForm({restaurant:"Пицца Ромео",address:"Дизенгоф 50",pay:32,pk:1.2,dl:3.5});
+show("shift");
+
+if("serviceWorker" in navigator&&location.protocol==="https:"){try{navigator.serviceWorker.register("sw.js").catch(()=>{})}catch(e){}}
+window.__parse=parsePhrase;
+})();
+</script>
+
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw.js')
+    .then(r => console.log('SW registered:', r.scope))
+    .catch(e => console.error('SW failed:', e));
+}
+</script>
+
+</body></html>
