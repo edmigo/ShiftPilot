@@ -1,4 +1,4 @@
-name: Build ShiftPilot Diagnostic APK
+name: Build ShiftPilot Diagnostic V2 APK
 
 on:
   workflow_dispatch:
